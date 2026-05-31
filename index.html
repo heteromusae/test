@@ -1,0 +1,1846 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>로그 발췌 툴</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- modern-screenshot (html2canvas 대체) -->
+    <script src="https://unpkg.com/modern-screenshot"></script>
+    
+    <!-- Marked.js (마크다운 파싱용) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Pickr (컬러 피커 라이브러리) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@400;700&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* 추가된 폰트들 */
+        @import url('//fonts.googleapis.com/earlyaccess/nanummyeongjo.css');
+
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-1Thin.woff2') format('woff2');
+            font-weight: 100;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-2ExtraLight.woff2') format('woff2');
+            font-weight: 200;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-3Light.woff2') format('woff2');
+            font-weight: 300;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+            font-weight: 500;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2') format('woff2');
+            font-weight: 600;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2') format('woff2');
+            font-weight: 800;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Paperozi';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-9Black.woff2') format('woff2');
+            font-weight: 900;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
+            font-weight: 100;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
+            font-weight: 200;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');
+            font-weight: 300;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
+            font-weight: 500;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');
+            font-weight: 600;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2');
+            font-weight: 800;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
+            font-weight: 900;
+            font-display: swap;
+        }
+
+        /* 새로 추가된 폰트들 */
+        @font-face { font-family: 'OngleipParkDahyeon'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2'); font-weight: normal; font-display: swap; }
+        @font-face { font-family: 'NeoDonggeunmo'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.3/NeoDunggeunmo.woff') format('woff'); font-weight: normal; font-display: swap; }
+        @font-face {
+            font-family: 'SchoolSafetyKidariBalloon';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2511-1@1.0/HakgyoansimKidaripungseonL.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+        @font-face { font-family: 'OngleIpSeaBreeze'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2510-1@1.0/Ownglyph_the_sea_breeze-Rg.woff2') format('woff2'); font-weight: normal; font-display: swap; }
+
+        /* 스크롤바 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #6b7280; }
+
+        .font-noto-sans { font-family: 'Noto Sans KR', sans-serif; }
+        
+        #editor {
+            white-space: pre-wrap;      
+            overflow-wrap: break-word;  
+            word-break: keep-all;       
+            text-align: justify;        
+            box-sizing: border-box; 
+        }
+        
+        #editor div, #editor p, #editor b, #editor i, #editor strong, #editor em {
+            line-height: inherit;
+        }
+        #editor p { margin: 0; min-height: 1em; }
+        
+        #editor h1, #editor h2, #editor h3 { font-weight: bold; margin: 0.5em 0; line-height: 1.4; }
+        #editor h1 { font-size: 1.5em; }
+        #editor h2 { font-size: 1.25em; }
+        #editor h3 { font-size: 1.1em; }
+        #editor ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.5em; }
+        #editor ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.5em; }
+        
+        #editor em { font-style: italic; opacity: 0.6; }
+
+        /* 들여쓰기 활성화 시 첫 줄 들여쓰기 0.5em 적용 */
+        #editor.indent-active { text-indent: 0.5em; }
+        #editor.indent-active div, #editor.indent-active p { text-indent: 0.5em; }
+
+        .toolbar-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;
+            color: #4b5563; transition: all 0.2s; cursor: pointer; background: transparent; border: none;
+        }
+        .toolbar-btn:hover, .toolbar-btn.active { background-color: #e5e7eb; color: #111827; }
+
+        .color-swatch {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #e5e7eb; cursor: pointer;
+            transition: transform 0.1s; display: inline-block;
+        }
+        .color-swatch:active { transform: scale(0.9); }
+        .color-swatch.active { border-color: #4f46e5; outline: 2px solid #c7d2fe; }
+
+        /* Pickr 버튼 크기 맞춤 설정 */
+        .pcr-button { width: 1.75rem !important; height: 1.75rem !important; border-radius: 0.25rem !important; }
+        .toolbar-pickr .pcr-button { width: 1rem !important; height: 1rem !important; border-radius: 0.25rem !important; }
+        .grad-pickr .pcr-button { width: 1.5rem !important; height: 1.5rem !important; border-radius: 0.25rem !important; }
+
+        /* CSS 종이 질감 바리에이션 */
+        .texture-basic {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.0' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+        .texture-rough {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .texture-canvas {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+            background-size: 10px 10px;
+        }
+
+        #export-wrapper {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative; 
+            min-height: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-[100dvh] w-screen flex flex-col md:flex-row overflow-hidden font-noto-sans text-gray-800">
+
+    <!-- 도움말 팝업 (모달) -->
+    <div id="helpModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-[110] flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 class="text-lg font-bold text-indigo-700 flex items-center gap-2">💡 사용 방법 및 기능 안내</h2>
+                <button onclick="closeHelp()" class="text-gray-400 hover:text-gray-600 transition flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto text-sm text-gray-700 space-y-5 custom-scrollbar leading-relaxed">
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-1">📌 프리셋 관리 및 자동 저장</h3>
+                    <p>입력한 로그와 설정은 새로고침을 해도 로컬 스토리지에 자동 저장됩니다. 마음에 드는 폰트, 여백, 색상 설정 조합은 [새 프리셋으로 저장]을 눌러 언제든 다시 불러올 수 있습니다.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-1">⚙️ 텍스트 자동 변환</h3>
+                    <p><b>일괄 변환:</b> 별표로 감싸지지 않은 일반 텍스트 문단에 지정한 따옴표를 입히고, 지문에 붙은 별표를 모두 삭제합니다.<br>
+                    <b>웹 서식 정리:</b> 외부에서 복사한 HTML 코드를 정리하여 불필요한 태그와 스타일은 지우고 텍스트만 깔끔하게 보존합니다.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-1">✨ 상단 툴바 기능</h3>
+                    <p><b>실행 취소 / 되돌리기:</b> 화살표 버튼을 통해 작업 내역을 되돌릴 수 있습니다.<br>
+                    <b>M↓ 마크다운:</b> *내용* 형식으로 작성시 기울임꼴과 함께 투명도 낮춤. 그 외에도 모든 마크다운 양식이 적용됩니다.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-1">📸 이미지 저장 및 자동 자르기</h3>
+                    <p>이미지 비율을 선택한 후 [발췌본 만들기]를 클릭하세요. [마지막 페이지 자동 자르기]가 켜져 있으면, 글이 끝나는 마지막 장에서 남는 잉여 공간을 잘라내 최종 출력본이 완성됩니다.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-1">✉️ 제작자 코멘트</h3>
+                    <p>문제 생기면 사이트 내립니다…. 부디 잘 써주시길 바라요 uu<br><br>
+                    <span class="text-xs text-gray-500">※ 본 사이트를 이용함으로써 발생할 수 있는 저작권 침해 등 모든 법적 분쟁 및 문제에 대한 책임은 전적으로 사용자 본인에게 있습니다.</span></p>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50 border-t border-gray-200 text-center">
+                <button onclick="closeHelp()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded shadow transition">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 미리보기 모달 -->
+    <div id="previewModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-[100] flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 flex-shrink-0">
+            <div class="text-white">
+                <h2 class="text-lg font-bold flex items-center gap-2">📖 발췌본 미리보기</h2>
+                <p class="text-xs text-gray-400 mt-1" id="previewStatus">이미지를 생성하는 중...</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closePreview()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded transition">수정하기</button>
+                <button id="downloadBtn" onclick="downloadAllImages()" class="hidden px-5 py-2 bg-indigo-600 hover:bg-indigo-50 text-white text-sm font-bold rounded transition shadow-lg flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    다운로드
+                </button>
+            </div>
+        </div>
+        <div id="previewContainer" class="flex-1 overflow-y-auto p-6 flex flex-col items-center gap-10 custom-scrollbar pb-20">
+            <!-- 캔버스 이미지 인젝션 -->
+        </div>
+    </div>
+
+    <!-- 모바일 헤더 -->
+    <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center z-20 flex-shrink-0 shadow-sm">
+        <h1 class="text-base font-bold flex items-center gap-2 text-indigo-700">
+            📖 로그 발췌 툴
+            <span class="text-[11px] font-normal text-gray-400 tracking-wide mt-0.5">by @heteromusae</span>
+        </h1>
+        <div class="flex items-center gap-2">
+            <button onclick="openHelp()" class="text-gray-500 hover:text-gray-800 p-1 flex-shrink-0" title="도움말">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </button>
+            <button onclick="toggleMobileMenu()" class="text-gray-600 p-1 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 설정 사이드바 -->
+    <aside id="sidebar" class="fixed inset-0 bg-white z-50 hidden flex-col md:relative md:flex md:w-[340px] md:border-r md:border-gray-200 shadow-sm flex-shrink-0">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 md:bg-white md:p-5">
+            <h2 class="font-bold text-base flex items-baseline gap-2 text-indigo-700">
+                📖 로그 발췌 툴
+                <span class="text-[11px] font-normal text-gray-400 tracking-wide">by @heteromusae</span>
+            </h2>
+            <div class="flex items-center gap-2">
+                <button onclick="openHelp()" class="hidden md:flex flex-shrink-0 items-center justify-center text-gray-400 hover:text-indigo-600 transition" title="도움말">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 flex-shrink-0 text-gray-500 hover:text-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-5 flex flex-col gap-6 flex-1 overflow-y-auto custom-scrollbar">
+            
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">프리셋 관리</h3>
+                <div class="flex gap-2 items-center">
+                    <select id="presetSelect" class="flex-1 border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50">
+                        <option value="">저장된 프리셋 없음</option>
+                    </select>
+                    <button onclick="loadPreset()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 font-bold py-1.5 px-2 rounded text-[10px] transition flex-shrink-0">불러오기</button>
+                    <button onclick="deletePreset()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold py-1.5 px-2 rounded text-[10px] transition flex-shrink-0">삭제</button>
+                </div>
+                <button onclick="savePreset()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 font-bold py-1.5 px-3 rounded text-xs transition">
+                    현재 설정 새 프리셋으로 저장
+                </button>
+            </div>
+            
+            <hr class="border-gray-100">
+
+            <!-- 텍스트 설정 -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">서식 설정</h3>
+                    <button onclick="resetAllSettings()" class="text-[10px] text-gray-500 hover:text-red-500 font-bold bg-gray-100 hover:bg-red-50 px-2 py-0.5 rounded border border-gray-200 transition">전체 초기화</button>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-medium mb-1 text-gray-700">폰트</label>
+                    <select id="globalFont" class="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-indigo-500 bg-gray-50" onchange="updateGlobalStyles()">
+                        <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">시스템 기본 폰트</option>
+                        <optgroup label="명조체">
+                            <option value="'Noto Serif KR', serif" selected>Noto Serif KR</option>
+                            <option value="'Nanum Myeongjo', serif">Nanum Myeongjo</option>
+                            <option value="'Gowun Batang', serif">Gowun Batang</option>
+                        </optgroup>
+                        <optgroup label="고딕체">
+                            <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                            <option value="'Gowun Dodum', sans-serif">Gowun Dodum</option>
+                            <option value="'Paperozi', sans-serif">Paperozi</option>
+                            <option value="'Pretendard', sans-serif">Pretendard</option>
+                        </optgroup>
+                        <optgroup label="손글씨/특수">
+                            <option value="'OngleipParkDahyeon', sans-serif">온글잎 박다현</option>
+                            <option value="'OngleIpSeaBreeze', sans-serif">온글잎 바닷바람</option>
+                            <option value="'SchoolSafetyKidariBalloon', sans-serif">학교안심 키다리풍선</option>
+                            <option value="'NeoDonggeunmo', sans-serif">네오둥근모</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium mb-1 text-gray-700">글씨 크기</label>
+                        <select id="globalFontSize" class="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-indigo-500 bg-gray-50" onchange="updateGlobalStyles()">
+                            <option value="6px">6px</option>
+                            <option value="7px">7px</option>
+                            <option value="8px">8px</option>
+                            <option value="9px">9px</option>
+                            <option value="10px" selected>10px (기본)</option>
+                            <option value="11px">11px</option>
+                            <option value="12px">12px</option>
+                            <option value="13px">13px</option>
+                            <option value="14px">14px</option>
+                            <option value="15px">15px</option>
+                            <option value="16px">16px</option>
+                            <option value="18px">18px</option>
+                            <option value="20px">20px</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1 text-gray-700">행간</label>
+                        <select id="globalLineHeight" class="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-indigo-500 bg-gray-50" onchange="updateGlobalStyles()">
+                            <option value="1.4">1.4 (좁게)</option>
+                            <option value="1.6">1.6 (보통)</option>
+                            <option value="1.8" selected>1.8 (조금 넓게)</option>
+                            <option value="2.0">2.0 (넓게)</option>
+                            <option value="2.2">2.2 (아주 넓게)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                        <label class="block text-xs font-medium mb-1 text-gray-700">자간 <span id="globalLetterSpacingVal" class="text-gray-500 font-normal ml-1">-0.5px</span></label>
+                        <input type="range" id="globalLetterSpacing" min="-3" max="5" step="0.5" value="-0.5" class="w-full accent-indigo-600" oninput="updateGlobalStyles()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1 text-gray-700">줄바꿈 기준</label>
+                        <select id="globalWordBreak" class="w-full border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="updateGlobalStyles()">
+                            <option value="keep-all" selected>띄어쓰기 단위</option>
+                            <option value="break-all">글자 단위</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                    <input type="checkbox" id="globalIndent" class="rounded text-indigo-600 focus:ring-indigo-500" onchange="updateGlobalStyles()">
+                    <label for="globalIndent" class="text-xs font-medium text-gray-700 cursor-pointer">문단 첫 줄 들여쓰기</label>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-xs font-bold text-indigo-600">여백 (전체 조절) <span id="globalPaddingVal" class="text-gray-500 font-normal ml-1">40px</span></label>
+                        <button onclick="resetPadding()" class="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 transition">기본값 초기화</button>
+                    </div>
+                    <input type="range" id="globalPadding" min="0" max="150" value="40" class="w-full accent-indigo-600 mb-3" oninput="syncPadding('all', this.value)">
+                    
+                    <div class="p-2.5 bg-gray-50 rounded border border-gray-200">
+                        <label class="block text-[10px] font-bold text-gray-500 mb-2">여백 세부 조절</label>
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-600 mb-0.5"><span>상 (Top)</span><span id="paddingTopVal">40px</span></div>
+                                <input type="range" id="paddingTop" min="0" max="150" value="40" class="w-full accent-gray-500" oninput="syncPadding('top', this.value)">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-600 mb-0.5"><span>하 (Bottom)</span><span id="paddingBottomVal">40px</span></div>
+                                <input type="range" id="paddingBottom" min="0" max="150" value="40" class="w-full accent-gray-500" oninput="syncPadding('bottom', this.value)">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-600 mb-0.5"><span>좌 (Left)</span><span id="paddingLeftVal">40px</span></div>
+                                <input type="range" id="paddingLeft" min="0" max="150" value="40" class="w-full accent-gray-500" oninput="syncPadding('left', this.value)">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] text-gray-600 mb-0.5"><span>우 (Right)</span><span id="paddingRightVal">40px</span></div>
+                                <input type="range" id="paddingRight" min="0" max="150" value="40" class="w-full accent-gray-500" oninput="syncPadding('right', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <!-- 테마 설정 -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">테마 / 색상</h3>
+                
+                <!-- 배경색 -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-medium text-gray-700">배경색</label>
+                        <div class="flex gap-2">
+                            <label class="flex items-center gap-1 text-[10px] cursor-pointer"><input type="radio" name="bgMode" value="solid" checked onchange="toggleBgMode()">단색</label>
+                            <label class="flex items-center gap-1 text-[10px] cursor-pointer"><input type="radio" name="bgMode" value="gradient" onchange="toggleBgMode()">그라데이션</label>
+                        </div>
+                    </div>
+                    
+                    <!-- 단색 모드 영역 -->
+                    <div id="solidBgArea">
+                        <div class="flex flex-wrap gap-1.5 mb-2">
+                            <button class="color-swatch bg-[#ffffff] active" data-type="bg" data-color="#ffffff" onclick="setPaletteColor(this, 'bg')" title="기본 화이트"></button>
+                            <button class="color-swatch bg-[#f8f6f2]" data-type="bg" data-color="#f8f6f2" onclick="setPaletteColor(this, 'bg')" title="연한 미색"></button>
+                            <button class="color-swatch bg-[#f2efe9]" data-type="bg" data-color="#f2efe9" onclick="setPaletteColor(this, 'bg')" title="연한 회갈색"></button>
+                            <button class="color-swatch bg-[#e8ece6]" data-type="bg" data-color="#e8ece6" onclick="setPaletteColor(this, 'bg')" title="차분한 민트"></button>
+                            <button class="color-swatch bg-[#f0eaea]" data-type="bg" data-color="#f0eaea" onclick="setPaletteColor(this, 'bg')" title="더스티 로즈"></button>
+                            <button class="color-swatch bg-[#e6e6e8]" data-type="bg" data-color="#e6e6e8" onclick="setPaletteColor(this, 'bg')" title="소프트 쿨그레이"></button>
+
+                            <button class="color-swatch bg-[#121212]" data-type="bg" data-color="#121212" onclick="setPaletteColor(this, 'bg')" title="다크 모드"></button>
+                            <button class="color-swatch bg-[#1e293b]" data-type="bg" data-color="#1e293b" onclick="setPaletteColor(this, 'bg')" title="네이비 다크"></button>
+                            <button class="color-swatch bg-[#2c302e]" data-type="bg" data-color="#2c302e" onclick="setPaletteColor(this, 'bg')" title="딥 포레스트"></button>
+                            <button class="color-swatch bg-[#3a3335]" data-type="bg" data-color="#3a3335" onclick="setPaletteColor(this, 'bg')" title="다크 모카"></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div id="bgPickr"></div>
+                            <input type="text" id="customBgHex" value="#ffffff" class="flex-1 border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 uppercase font-mono" placeholder="#FFFFFF" oninput="applyCustomColor('bg', this.value)">
+                        </div>
+                    </div>
+
+                    <!-- 그라데이션 모드 영역 -->
+                    <div id="gradientBgArea" class="hidden bg-gray-50 p-2.5 rounded border border-gray-200 mt-2">
+                        
+                        <!-- 그라데이션 프리셋 10개 추가 -->
+                        <div class="flex flex-wrap gap-1.5 mb-3">
+                            <button class="color-swatch" data-type="grad" data-c1="#fdfbfb" data-c2="#ebedee" style="background: linear-gradient(135deg, #fdfbfb, #ebedee)" onclick="setGradPreset(this, '#fdfbfb', '#ebedee')" title="클라우드"></button>
+                            <button class="color-swatch active" data-type="grad" data-c1="#fbcfe8" data-c2="#93c5fd" style="background: linear-gradient(135deg, #fbcfe8, #93c5fd)" onclick="setGradPreset(this, '#fbcfe8', '#93c5fd')" title="코튼 캔디"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#fdfbfb" data-c2="#f3e6e8" style="background: linear-gradient(135deg, #fdfbfb, #f3e6e8)" onclick="setGradPreset(this, '#fdfbfb', '#f3e6e8')" title="소프트 핑크"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#eafaf1" data-c2="#cce7d0" style="background: linear-gradient(135deg, #eafaf1, #cce7d0)" onclick="setGradPreset(this, '#eafaf1', '#cce7d0')" title="소프트 민트"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#e6e9f0" data-c2="#eef1f5" style="background: linear-gradient(135deg, #e6e9f0, #eef1f5)" onclick="setGradPreset(this, '#e6e9f0', '#eef1f5')" title="쿨 그레이"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#f5f7fa" data-c2="#c3cfe2" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2)" onclick="setGradPreset(this, '#f5f7fa', '#c3cfe2')" title="더스티 블루"></button>
+                            
+                            <button class="color-swatch" data-type="grad" data-c1="#232526" data-c2="#414345" style="background: linear-gradient(135deg, #232526, #414345)" onclick="setGradPreset(this, '#232526', '#414345')" title="다크 스틸"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#0f2027" data-c2="#203a43" style="background: linear-gradient(135deg, #0f2027, #203a43)" onclick="setGradPreset(this, '#0f2027', '#203a43')" title="딥 씨"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#000000" style="background: linear-gradient(135deg, #2c3e50, #000000)" onclick="setGradPreset(this, '#2c3e50', '#000000')" title="미드나잇"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#1e130c" data-c2="#3a2f28" style="background: linear-gradient(135deg, #1e130c, #3a2f28)" onclick="setGradPreset(this, '#1e130c', '#3a2f28')" title="다크 우드"></button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div>
+                                <label class="block text-[10px] text-gray-500 mb-1">시작 색상</label>
+                                <div class="flex items-center gap-1 grad-pickr">
+                                    <div id="gradPickr1"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-500 mb-1">끝 색상</label>
+                                <div class="flex items-center gap-1 grad-pickr">
+                                    <div id="gradPickr2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-[10px] text-gray-500 mb-1">방향</label>
+                            <select id="gradDirection" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="updateGlobalStyles()">
+                                <option value="to bottom" selected>↓</option>
+                                <option value="to right">→</option>
+                                <option value="to bottom right">↘</option>
+                                <option value="to top right">↗</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">그라데이션 중심점 (<span id="gradPosVal">50</span>%)</label>
+                            <input type="range" id="gradPos" min="0" max="100" value="50" class="w-full accent-indigo-600" oninput="updateGlobalStyles()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 글자색 -->
+                <div>
+                    <label class="block text-xs font-medium mb-1.5 text-gray-700">글자색</label>
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                        <button class="color-swatch bg-[#111111] active" data-type="text" data-color="#111111" onclick="setPaletteColor(this, 'text')"></button>
+                        <button class="color-swatch bg-[#333333]" data-type="text" data-color="#333333" onclick="setPaletteColor(this, 'text')"></button>
+                        <button class="color-swatch bg-[#555555]" data-type="text" data-color="#555555" onclick="setPaletteColor(this, 'text')"></button>
+                        <button class="color-swatch bg-[#4a4440]" data-type="text" data-color="#4a4440" onclick="setPaletteColor(this, 'text')" title="다크 브라운"></button>
+                        <button class="color-swatch bg-[#36454f]" data-type="text" data-color="#36454f" onclick="setPaletteColor(this, 'text')" title="차콜 블루"></button>
+                        <button class="color-swatch bg-[#7b756d]" data-type="text" data-color="#7b756d" onclick="setPaletteColor(this, 'text')" title="뮤트 브라운"></button>
+
+                        <button class="color-swatch bg-[#e0e0e0]" data-type="text" data-color="#e0e0e0" onclick="setPaletteColor(this, 'text')"></button>
+                        <button class="color-swatch bg-[#f5f5f5]" data-type="text" data-color="#f5f5f5" onclick="setPaletteColor(this, 'text')" title="오프 화이트"></button>
+                        <button class="color-swatch bg-[#d1cac7]" data-type="text" data-color="#d1cac7" onclick="setPaletteColor(this, 'text')" title="라이트 베이지"></button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div id="textPickr"></div>
+                        <input type="text" id="customTextHex" value="#111111" class="flex-1 border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 uppercase font-mono" placeholder="#111111" oninput="applyCustomColor('text', this.value)">
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <label class="block text-xs font-medium mb-1.5 text-gray-700">종이 질감 효과</label>
+                    <select id="paperTexture" class="w-full border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="toggleTexture()">
+                        <option value="none" selected>적용 안 함</option>
+                        <option value="basic">기본 노이즈</option>
+                        <option value="rough">거친 종이</option>
+                        <option value="canvas">캔버스</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <!-- 대사 자동 변환 기능 -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">텍스트 변환</h3>
+                
+                <div>
+                    <label class="block text-xs font-medium mb-1 text-gray-700">대사 자동 변환</label>
+                    <div class="flex gap-2">
+                        <select id="quoteStyle" class="flex-1 border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50">
+                            <option value="smart">“ ” (둥근 따옴표)</option>
+                            <option value="straight">" " (직선 따옴표)</option>
+                        </select>
+                        <button onclick="formatDialogue()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 font-bold py-1.5 px-3 rounded text-xs transition flex-shrink-0">
+                            일괄 변환
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-1.5 leading-tight">
+                        별표로 감싸지지 않은 문단에 따옴표를 씌우고, 글 전체의 별표를 삭제합니다. (기존 서식은 초기화됩니다)
+                    </p>
+                </div>
+
+                <!-- 웹 서식 완전 제거 -->
+                <div class="mt-3 bg-gray-50 p-2.5 rounded border border-gray-200">
+                    <label class="block text-xs font-bold text-gray-600 mb-1">웹 서식 정리</label>
+                    <p class="text-[10px] text-gray-500 mb-2.5 leading-tight">
+                        로그의 style 태그 내용, 숨겨진 텍스트, 코드블럭(```)을 모두 삭제하고 텍스트만 남깁니다.
+                    </p>
+                    <button onclick="cleanHtmlAndHidden()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">
+                        정리 실행하기
+                    </button>
+                </div>
+
+                <!-- 위아래 빈 줄 제거 -->
+                <div class="mt-3 bg-gray-50 p-2.5 rounded border border-gray-200">
+                    <label class="block text-xs font-bold text-gray-600 mb-1">위아래 여백(빈 줄) 제거</label>
+                    <p class="text-[10px] text-gray-500 mb-2.5 leading-tight">
+                        로그 맨 위와 맨 아래에 들어간 불필요한 엔터(빈 줄)를 일괄 삭제하여 깔끔하게 정리합니다.
+                    </p>
+                    <button onclick="trimEmptyLines()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">
+                        위아래 빈 줄 지우기
+                    </button>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <!-- 발췌 이미지 설정 -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">출력 설정</h3>
+                
+                <div>
+                    <label class="block text-xs font-medium mb-1 text-gray-700">최종 캡처 비율 (자르기)</label>
+                    <select id="imageRatio" class="w-full border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50">
+                        <optgroup label="세로형 (단행본/모바일)">
+                            <option value="1.5" selected>1 : 1.5 (소설책 단행본 - 추천)</option>
+                            <option value="1.414">1 : 1.414 (A4 용지)</option>
+                            <option value="1.25">4 : 5 (인스타 세로)</option>
+                            <option value="2.0">1 : 2 (웹소설 뷰어)</option>
+                        </optgroup>
+                        <optgroup label="가로형 (PC/배경화면)">
+                            <option value="0.5625">16 : 9 (와이드 가로형)</option>
+                            <option value="0.75">4 : 3 (표준 가로형)</option>
+                            <option value="0.428">21 : 9 (영화 비율 가로형)</option>
+                        </optgroup>
+                        <optgroup label="기타">
+                            <option value="1.0">1 : 1 (정방형)</option>
+                            <option value="auto">비율 무시 (자르지 않고 통째로 1장 캡처)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-100">
+                    <label class="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="autoTrim" class="rounded text-indigo-600 focus:ring-indigo-500" checked onchange="saveAutoSettings()">
+                        <span>마지막 페이지 여백 자동 자르기</span>
+                    </label>
+                    
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5 text-gray-700">발췌본 저장 순서</label>
+                        <div class="flex gap-2">
+                            <label class="flex items-center gap-1 text-[10px] cursor-pointer">
+                                <input type="radio" name="dlOrder" value="forward" checked onchange="saveAutoSettings()">정방향 (첫 장부터)
+                            </label>
+                            <label class="flex items-center gap-1 text-[10px] cursor-pointer">
+                                <input type="radio" name="dlOrder" value="reverse" onchange="saveAutoSettings()">역방향 (마지막 장부터)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-200">
+            <button onclick="generatePreview()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded shadow-md transition flex items-center justify-center gap-2">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                발췌본 만들기
+            </button>
+        </div>
+    </aside>
+
+    <!-- 에디터 영역 -->
+    <main class="flex-1 flex flex-col h-full min-w-0 bg-[#eef2f6] overflow-hidden">
+        
+        <!-- 상단 툴바 -->
+        <header class="bg-white border-b border-gray-200 p-2 flex items-center gap-1 overflow-x-auto whitespace-nowrap shadow-sm z-10 flex-shrink-0">
+            
+            <!-- 전체 삭제 (맨 왼쪽) -->
+            <button class="toolbar-btn text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-100" onmousedown="event.preventDefault()" onclick="clearEditorContent()" title="내용 전체 삭제">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+
+            <!-- 클립보드 붙여넣기 -->
+            <button class="toolbar-btn text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100" onmousedown="event.preventDefault()" onclick="pasteFromClipboard()" title="클립보드 내용으로 전체 덮어쓰기">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            </button>
+            
+            <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
+
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('undo')" title="실행 취소">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"></path></svg>
+            </button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('redo')" title="되돌리기">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"></path></svg>
+            </button>
+            <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
+
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('bold')" title="굵게"><b class="text-base font-serif">B</b></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('italic')" title="기울임"><i class="text-base font-serif">I</i></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('underline')" title="밑줄"><u class="text-base font-serif">U</u></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('strikeThrough')" title="취소선"><s class="text-base font-serif">S</s></button>
+            
+            <!-- 블러 버튼 추가 -->
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyBlurToText()" title="흐리게 블러 처리 (스포일러 방지)">
+                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+            </button>
+
+            <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
+
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('justifyLeft')" title="왼쪽 정렬"><svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg></button>
+            <button class="toolbar-btn active" onmousedown="event.preventDefault()" onclick="execCmd('justifyFull')" title="양쪽 정렬 (소설용)"><svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="3" y2="12"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('justifyCenter')" title="가운데 정렬"><svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="19" y1="12" x2="5" y2="12"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('justifyRight')" title="오른쪽 정렬"><svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="9" y2="12"></line><line x1="21" y1="18" x2="5" y2="18"></line></svg></button>
+
+            <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
+            
+            <div class="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded border border-gray-200 flex-shrink-0 toolbar-pickr">
+                <span class="text-[10px] text-gray-500 mr-1">글자색</span>
+                <button class="w-4 h-4 rounded-full bg-[#ef4444]" onmousedown="event.preventDefault()" onclick="execCmd('foreColor', '#ef4444')"></button>
+                <button class="w-4 h-4 rounded-full bg-[#3b82f6]" onmousedown="event.preventDefault()" onclick="execCmd('foreColor', '#3b82f6')"></button>
+                <button class="w-4 h-4 rounded-full bg-[#111111]" onmousedown="event.preventDefault()" onclick="execCmd('foreColor', '#111111')"></button>
+                
+                <div class="w-px h-3 bg-gray-300 mx-0.5"></div>
+                <div id="toolbarPickr" title="자율 글자색 선택"></div>
+                <button id="lastCustomColorBtn" class="w-4 h-4 rounded shadow-sm border border-gray-300 ml-0.5" style="background-color: #9333ea;" onmousedown="event.preventDefault()" onclick="execCmd('foreColor', lastToolbarColor)" title="최근 선택한 자율색 적용"></button>
+            </div>
+
+            <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
+
+            <button class="toolbar-btn px-2 w-auto text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 flex-shrink-0" onmousedown="event.preventDefault()" onclick="applyMarkdown()">
+                M↓ 마크다운
+            </button>
+
+            <button class="toolbar-btn px-2 w-auto text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded ml-1 flex-shrink-0" onmousedown="event.preventDefault()" onclick="clearFormatting()">
+                서식 지우기
+            </button>
+        </header>
+
+        <!-- 스크롤 본문 -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start relative" id="scroll-area">
+            
+            <!-- 트랜지션 클래스 제거하여 빠른 반영을 돕도록 수정 -->
+            <div id="export-wrapper" class="w-full max-w-[500px] bg-white relative">
+                <!-- 종이 질감 오버레이 -->
+                <div id="texture-overlay" class="absolute inset-0 z-10 pointer-events-none opacity-0"></div>
+                
+                <div id="editor" contenteditable="true" class="w-full outline-none font-noto-serif relative z-20" style="font-size: 10px; line-height: 1.8; letter-spacing: -0.5px; color: #111111; padding: 40px;" spellcheck="false">이곳에 발췌할 로그를 붙여넣으세요. </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentBgColor = '#ffffff';
+        let currentTextColor = '#111111';
+        let lastToolbarColor = '#9333ea';
+        
+        let gradColor1 = '#fbcfe8';
+        let gradColor2 = '#93c5fd';
+
+        // Pickr의 change 이벤트 무한루프를 제어하는 상태 플래그
+        let isSyncingBg = false;
+        let isSyncingText = false;
+        let isSyncingGrad1 = false;
+        let isSyncingGrad2 = false;
+
+        let previewImages = [];
+        let savedSelectionRange = null;
+
+        // Pickr 설정 공통 옵션
+        const pickrConfig = {
+            theme: 'classic',
+            swatches: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#111111', '#ffffff'],
+            components: {
+                preview: true, opacity: false, hue: true,
+                interaction: { hex: true, input: true, clear: false, save: true }
+            }
+        };
+
+        let bgPickr, textPickr, toolbarPickr, gradPickr1, gradPickr2;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            bgPickr = Pickr.create({ el: '#bgPickr', default: '#ffffff', ...pickrConfig });
+            bgPickr.on('save', (color) => { 
+                if(!isSyncingBg) applyCustomColor('bg', color.toHEXA().toString(), true); 
+                bgPickr.hide(); 
+            });
+            bgPickr.on('change', (color) => { 
+                if(!isSyncingBg) applyCustomColor('bg', color.toHEXA().toString(), true); 
+            });
+
+            textPickr = Pickr.create({ el: '#textPickr', default: '#111111', ...pickrConfig });
+            textPickr.on('save', (color) => { 
+                if(!isSyncingText) applyCustomColor('text', color.toHEXA().toString(), true); 
+                textPickr.hide(); 
+            });
+            textPickr.on('change', (color) => { 
+                if(!isSyncingText) applyCustomColor('text', color.toHEXA().toString(), true); 
+            });
+
+            toolbarPickr = Pickr.create({ el: '#toolbarPickr', default: '#9333ea', ...pickrConfig });
+            toolbarPickr.on('save', (color) => {
+                lastToolbarColor = color.toHEXA().toString();
+                document.getElementById('lastCustomColorBtn').style.backgroundColor = lastToolbarColor;
+                execCmd('foreColor', lastToolbarColor);
+                toolbarPickr.hide();
+            });
+
+            gradPickr1 = Pickr.create({ el: '#gradPickr1', default: '#fbcfe8', ...pickrConfig });
+            gradPickr1.on('save', (color) => { 
+                if(!isSyncingGrad1) { gradColor1 = color.toHEXA().toString(); updateGlobalStyles(); }
+                gradPickr1.hide(); 
+            });
+            gradPickr1.on('change', (color) => { 
+                if(!isSyncingGrad1) { gradColor1 = color.toHEXA().toString(); updateGlobalStyles(); } 
+            });
+
+            gradPickr2 = Pickr.create({ el: '#gradPickr2', default: '#93c5fd', ...pickrConfig });
+            gradPickr2.on('save', (color) => { 
+                if(!isSyncingGrad2) { gradColor2 = color.toHEXA().toString(); updateGlobalStyles(); } 
+                gradPickr2.hide(); 
+            });
+            gradPickr2.on('change', (color) => { 
+                if(!isSyncingGrad2) { gradColor2 = color.toHEXA().toString(); updateGlobalStyles(); } 
+            });
+
+            // 자동 저장 내역 로드 (팝업 없이 자동)
+            const savedLog = localStorage.getItem('autoSavedLog');
+            const editorNode = document.getElementById('editor');
+            if (savedLog && savedLog.trim() !== '' && savedLog.trim() !== '이곳에 발췌할 로그를 붙여넣으세요.') {
+                editorNode.innerHTML = savedLog;
+            }
+
+            // 자동 설정 로드
+            const autoSettings = JSON.parse(localStorage.getItem('autoSavedSettings'));
+            if (autoSettings) {
+                applySettingsObject(autoSettings);
+            }
+
+            const observer = new MutationObserver(() => {
+                localStorage.setItem('autoSavedLog', editorNode.innerHTML);
+            });
+            observer.observe(editorNode, { childList: true, subtree: true, characterData: true });
+        });
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const editor = document.getElementById('editor');
+                if (editor && editor.contains(range.commonAncestorContainer)) {
+                    savedSelectionRange = range;
+                }
+            }
+        });
+
+        document.getElementById('editor').addEventListener('paste', function(e) {
+            e.preventDefault();
+            let text = (e.originalEvent || e).clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+
+        async function pasteFromClipboard() {
+            if(confirm('이미 입력된 내용이 모두 지워집니다. 클립보드의 내용으로 덮어쓰시겠습니까?')) {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const editor = document.getElementById('editor');
+                    editor.focus();
+                    document.execCommand('selectAll', false, null);
+                    document.execCommand('insertText', false, text);
+                } catch (err) {
+                    alert('클립보드 접근에 실패했습니다. 브라우저 권한을 확인해주시거나 직접 붙여넣기(Ctrl+V) 해주세요.');
+                }
+            }
+        }
+
+        function clearEditorContent() {
+            if(confirm('모든 로그 내용이 삭제됩니다. 계속하시겠습니까?')) {
+                const editor = document.getElementById('editor');
+                editor.innerHTML = '';
+                editor.focus();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+        }
+
+        function openHelp() {
+            document.getElementById('helpModal').classList.remove('hidden');
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').classList.add('hidden');
+        }
+
+        function toggleBgMode() {
+            const mode = document.querySelector('input[name="bgMode"]:checked').value;
+            if (mode === 'solid') {
+                document.getElementById('solidBgArea').classList.remove('hidden');
+                document.getElementById('gradientBgArea').classList.add('hidden');
+            } else {
+                document.getElementById('solidBgArea').classList.add('hidden');
+                document.getElementById('gradientBgArea').classList.remove('hidden');
+            }
+            updateGlobalStyles();
+        }
+
+        function syncPadding(type, value) {
+            if (type === 'all') {
+                document.getElementById('paddingTop').value = value;
+                document.getElementById('paddingBottom').value = value;
+                document.getElementById('paddingLeft').value = value;
+                document.getElementById('paddingRight').value = value;
+                
+                document.getElementById('globalPaddingVal').innerText = value + 'px';
+                document.getElementById('paddingTopVal').innerText = value + 'px';
+                document.getElementById('paddingBottomVal').innerText = value + 'px';
+                document.getElementById('paddingLeftVal').innerText = value + 'px';
+                document.getElementById('paddingRightVal').innerText = value + 'px';
+            } else {
+                const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
+                document.getElementById('padding' + capitalizedType + 'Val').innerText = value + 'px';
+            }
+            updateGlobalStyles();
+        }
+
+        function resetPadding() {
+            const defaultVal = 40;
+            document.getElementById('globalPadding').value = defaultVal;
+            syncPadding('all', defaultVal);
+        }
+
+        function setPaletteColor(buttonElement, type) {
+            const color = buttonElement.getAttribute('data-color');
+            applyCustomColor(type, color);
+        }
+
+        // 그라데이션 프리셋 적용
+        function setGradPreset(buttonElement, c1, c2) {
+            const siblings = document.querySelectorAll('.color-swatch[data-type="grad"]');
+            siblings.forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+
+            gradColor1 = c1;
+            gradColor2 = c2;
+            
+            if(gradPickr1) { isSyncingGrad1 = true; gradPickr1.setColor(c1); isSyncingGrad1 = false; }
+            if(gradPickr2) { isSyncingGrad2 = true; gradPickr2.setColor(c2); isSyncingGrad2 = false; }
+            
+            updateGlobalStyles();
+        }
+
+        // Pickr 버튼의 UI까지 정상적으로 변경될 수 있도록 수정
+        function applyCustomColor(type, value, fromPickr = false) {
+            const siblings = document.querySelectorAll(`.color-swatch[data-type="${type}"]`);
+            siblings.forEach(btn => btn.classList.remove('active'));
+
+            let hex = value.trim();
+            if (hex.length > 0 && !hex.startsWith('#') && !hex.startsWith('rgba') && !hex.startsWith('rgb')) {
+                hex = '#' + hex;
+            }
+            
+            // 일치하는 색상 버튼이 있으면 활성화
+            siblings.forEach(btn => {
+                if(btn.getAttribute('data-color').toLowerCase() === hex.toLowerCase()) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (type === 'bg') {
+                currentBgColor = hex;
+                if(document.getElementById('customBgHex').value !== hex) {
+                    document.getElementById('customBgHex').value = hex;
+                }
+                if (!fromPickr && bgPickr) {
+                    isSyncingBg = true;
+                    bgPickr.setColor(hex);
+                    isSyncingBg = false;
+                }
+            } else if (type === 'text') {
+                currentTextColor = hex;
+                if(document.getElementById('customTextHex').value !== hex) {
+                    document.getElementById('customTextHex').value = hex;
+                }
+                if (!fromPickr && textPickr) {
+                    isSyncingText = true;
+                    textPickr.setColor(hex);
+                    isSyncingText = false;
+                }
+            }
+            updateGlobalStyles();
+        }
+
+        function resetAllSettings() {
+            if(!confirm('모든 서식과 테마 설정을 기본값으로 초기화하시겠습니까? (입력된 텍스트는 유지됩니다)')) return;
+
+            document.getElementById('globalFont').value = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+            document.getElementById('globalFontSize').value = "10px";
+            document.getElementById('globalLineHeight').value = "1.8";
+            document.getElementById('globalLetterSpacing').value = "-0.5";
+            document.getElementById('globalWordBreak').value = "keep-all";
+            document.getElementById('globalIndent').checked = false;
+            
+            document.getElementById('globalPadding').value = "40";
+            document.getElementById('paddingTop').value = "40";
+            document.getElementById('paddingBottom').value = "40";
+            document.getElementById('paddingLeft').value = "40";
+            document.getElementById('paddingRight').value = "40";
+            
+            document.getElementById('globalPaddingVal').innerText = "40px";
+            document.getElementById('paddingTopVal').innerText = "40px";
+            document.getElementById('paddingBottomVal').innerText = "40px";
+            document.getElementById('paddingLeftVal').innerText = "40px";
+            document.getElementById('paddingRightVal').innerText = "40px";
+
+            document.getElementById('paperTexture').value = "none";
+            document.getElementById('imageRatio').value = "1.5";
+            document.getElementById('quoteStyle').value = "smart";
+            document.getElementById('autoTrim').checked = true;
+            if(document.querySelector('input[name="dlOrder"][value="forward"]')) document.querySelector('input[name="dlOrder"][value="forward"]').checked = true;
+
+            document.querySelector(`input[name="bgMode"][value="solid"]`).checked = true;
+            toggleBgMode();
+
+            gradColor1 = '#fbcfe8';
+            gradColor2 = '#93c5fd';
+            if(gradPickr1) { isSyncingGrad1 = true; gradPickr1.setColor(gradColor1); isSyncingGrad1 = false; }
+            if(gradPickr2) { isSyncingGrad2 = true; gradPickr2.setColor(gradColor2); isSyncingGrad2 = false; }
+            document.getElementById('gradDirection').value = "to bottom";
+            document.getElementById('gradPos').value = "50";
+
+            // 그라데이션 프리셋 활성화 해제 및 기본값 갱신
+            const gradSiblings = document.querySelectorAll('.color-swatch[data-type="grad"]');
+            gradSiblings.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('data-c1').toLowerCase() === gradColor1.toLowerCase() && btn.getAttribute('data-c2').toLowerCase() === gradColor2.toLowerCase()) {
+                    btn.classList.add('active');
+                }
+            });
+
+            applyCustomColor('bg', "#ffffff");
+            applyCustomColor('text', "#111111");
+            
+            toggleTexture();
+            updateGlobalStyles();
+        }
+
+        function updateGlobalStyles() {
+            if(!document.getElementById('editor')) return;
+            const editor = document.getElementById('editor');
+            const wrapper = document.getElementById('export-wrapper');
+            
+            const fontFamily = document.getElementById('globalFont').value;
+            const fontSize = document.getElementById('globalFontSize').value;
+            const lineHeight = document.getElementById('globalLineHeight').value;
+            const letterSpacing = document.getElementById('globalLetterSpacing').value + 'px';
+            const wordBreak = document.getElementById('globalWordBreak').value;
+            
+            document.getElementById('globalLetterSpacingVal').innerText = letterSpacing;
+
+            const pt = document.getElementById('paddingTop').value + 'px';
+            const pb = document.getElementById('paddingBottom').value + 'px';
+            const pl = document.getElementById('paddingLeft').value + 'px';
+            const pr = document.getElementById('paddingRight').value + 'px';
+
+            editor.style.fontFamily = fontFamily;
+            editor.style.fontSize = fontSize;
+            editor.style.lineHeight = lineHeight;
+            editor.style.letterSpacing = letterSpacing;
+            editor.style.wordBreak = wordBreak; 
+            editor.style.color = currentTextColor;
+            
+            editor.style.paddingTop = pt;
+            editor.style.paddingBottom = pb;
+            editor.style.paddingLeft = pl;
+            editor.style.paddingRight = pr;
+            
+            if(document.querySelector('.toolbar-btn[title="양쪽 정렬 (소설용)"]').classList.contains('active')) {
+                editor.style.textAlign = 'justify';
+            }
+
+            if(document.getElementById('globalIndent').checked) {
+                editor.classList.add('indent-active');
+            } else {
+                editor.classList.remove('indent-active');
+            }
+
+            // 배경 모드 처리
+            const bgMode = document.querySelector('input[name="bgMode"]:checked').value;
+            if (bgMode === 'solid') {
+                wrapper.style.background = currentBgColor;
+            } else {
+                const dir = document.getElementById('gradDirection').value;
+                const gradPos = document.getElementById('gradPos').value;
+                if(document.getElementById('gradPosVal')) document.getElementById('gradPosVal').innerText = gradPos;
+                wrapper.style.background = `linear-gradient(${dir}, ${gradColor1}, ${gradPos}%, ${gradColor2})`;
+            }
+
+            saveAutoSettings();
+        }
+
+        function saveAutoSettings() {
+            if(!document.getElementById('globalFont')) return; 
+            const settings = {
+                font: document.getElementById('globalFont').value,
+                fontSize: document.getElementById('globalFontSize').value,
+                lineHeight: document.getElementById('globalLineHeight').value,
+                letterSpacing: document.getElementById('globalLetterSpacing').value,
+                wordBreak: document.getElementById('globalWordBreak').value,
+                indent: document.getElementById('globalIndent').checked,
+                padding: document.getElementById('globalPadding').value,
+                paddingTop: document.getElementById('paddingTop').value,
+                paddingBottom: document.getElementById('paddingBottom').value,
+                paddingLeft: document.getElementById('paddingLeft').value,
+                paddingRight: document.getElementById('paddingRight').value,
+                
+                bgMode: document.querySelector('input[name="bgMode"]:checked').value,
+                bgColor: currentBgColor,
+                gradColor1: gradColor1,
+                gradColor2: gradColor2,
+                gradDirection: document.getElementById('gradDirection').value,
+                gradPos: document.getElementById('gradPos').value,
+                
+                textColor: currentTextColor,
+                texture: document.getElementById('paperTexture').value,
+                ratio: document.getElementById('imageRatio').value,
+                quoteStyle: document.getElementById('quoteStyle').value,
+                autoTrim: document.getElementById('autoTrim').checked,
+                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward'
+            };
+            localStorage.setItem('autoSavedSettings', JSON.stringify(settings));
+        }
+
+        function toggleTexture() {
+            const overlay = document.getElementById('texture-overlay');
+            const val = document.getElementById('paperTexture').value;
+            
+            overlay.className = 'absolute inset-0 z-10 pointer-events-none opacity-0';
+            
+            if (val !== 'none') {
+                overlay.classList.add('texture-' + val);
+                overlay.style.opacity = '1';
+            } else {
+                overlay.style.opacity = '0';
+            }
+            saveAutoSettings();
+        }
+
+        function formatDialogue() {
+            const editor = document.getElementById('editor');
+            const quoteStyle = document.getElementById('quoteStyle').value;
+            
+            let rawText = editor.innerText;
+            if (!rawText.trim()) return;
+
+            let lines = rawText.split('\n');
+            
+            let newLines = lines.map(line => {
+                let trimmed = line.trim();
+                if (!trimmed) return null; // 빈 줄 표시
+                
+                let isWrapped = trimmed.startsWith('*') && trimmed.endsWith('*');
+                let cleaned = trimmed.replace(/\*/g, '').trim();
+                
+                if (!cleaned) return null; 
+                
+                if (!isWrapped) {
+                    if (quoteStyle === 'smart') {
+                        return `“${cleaned}”`;
+                    } else {
+                        return `"${cleaned}"`;
+                    }
+                } else {
+                    return cleaned;
+                }
+            });
+
+            const filteredLines = newLines.filter(line => line !== null);
+            const finalString = filteredLines.join('\n\n'); 
+
+            editor.focus();
+            document.execCommand('selectAll', false, null);
+            document.execCommand('insertText', false, finalString);
+        }
+
+        // 위아래 불필요한 공백, 빈 줄, 빈 태그들을 완전히 지우는 기능 추가
+        function trimEmptyLines() {
+            const editor = document.getElementById('editor');
+            const clone = editor.cloneNode(true);
+            let changed = false;
+            
+            // 앞쪽 빈 줄/공백 제거
+            while(clone.firstChild) {
+                let node = clone.firstChild;
+                let isNodeEmpty = false;
+                
+                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '') {
+                    isNodeEmpty = true;
+                } else if (node.nodeName === 'BR') {
+                    isNodeEmpty = true;
+                } else if ((node.nodeName === 'DIV' || node.nodeName === 'P' || node.nodeName === 'SPAN') && node.innerHTML.replace(/&nbsp;|\s|<br\s*\/?>/gi, '') === '') {
+                    isNodeEmpty = true;
+                }
+                
+                if (isNodeEmpty) {
+                    clone.removeChild(node);
+                    changed = true;
+                } else {
+                    break;
+                }
+            }
+            
+            // 뒤쪽 빈 줄/공백 제거
+            while(clone.lastChild) {
+                let node = clone.lastChild;
+                let isNodeEmpty = false;
+                
+                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '') {
+                    isNodeEmpty = true;
+                } else if (node.nodeName === 'BR') {
+                    isNodeEmpty = true;
+                } else if ((node.nodeName === 'DIV' || node.nodeName === 'P' || node.nodeName === 'SPAN') && node.innerHTML.replace(/&nbsp;|\s|<br\s*\/?>/gi, '') === '') {
+                    isNodeEmpty = true;
+                }
+                
+                if (isNodeEmpty) {
+                    clone.removeChild(node);
+                    changed = true;
+                } else {
+                    break;
+                }
+            }
+            
+            if (changed) {
+                let finalHtml = clone.innerHTML;
+                if (finalHtml === '') finalHtml = '이곳에 발췌할 로그를 붙여넣으세요.';
+                
+                editor.focus();
+                document.execCommand('selectAll', false, null);
+                document.execCommand('insertHTML', false, finalHtml);
+            }
+        }
+
+        // HTML 및 히든 블록 완전 제거 
+        function cleanHtmlAndHidden() {
+            const editor = document.getElementById('editor');
+            
+            // 1. DOM 내부의 details와 summary 노드를 자식 내용까지 통째로 삭제
+            const detailsElements = editor.querySelectorAll('details');
+            detailsElements.forEach(el => el.remove());
+            const summaryElements = editor.querySelectorAll('summary');
+            summaryElements.forEach(el => el.remove());
+            
+            const elements = editor.querySelectorAll('*');
+            elements.forEach(el => {
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+                    el.remove();
+                }
+            });
+            
+            let rawText = editor.innerHTML;
+            
+            // 2. HTML 문자열 상태에서 정규식으로 통째로 삭제 (내용물 포함)
+            rawText = rawText.replace(/<details[^>]*>[\s\S]*?<\/details>/gi, '');
+            rawText = rawText.replace(/<summary[^>]*>[\s\S]*?<\/summary>/gi, '');
+            
+            // 줄바꿈 보존을 위해 변환
+            rawText = rawText.replace(/<\/div>/gi, '\n');
+            rawText = rawText.replace(/<\/p>/gi, '\n');
+            rawText = rawText.replace(/<br\s*[\/]?>/gi, '\n');
+            
+            rawText = rawText.replace(/<!--[\s\S]*?-->/g, ''); 
+            rawText = rawText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); 
+            rawText = rawText.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ''); 
+            rawText = rawText.replace(/```[\s\S]*?```/g, ''); // 코드블럭 완전 삭제
+            rawText = rawText.replace(/<[^>]+>/g, ''); // 남은 모든 태그 삭제
+            
+            // 디코딩 및 텍스트 추출 ( textarea를 이용해 엔티티 변환 )
+            const temp = document.createElement('textarea');
+            temp.innerHTML = rawText;
+            let finalStr = temp.value;
+            
+            // 3. 디코딩 후 텍스트로 숨어있던 태그까지 3차 확인 및 완전 삭제
+            finalStr = finalStr.replace(/<details[^>]*>[\s\S]*?<\/details>/gi, '');
+            finalStr = finalStr.replace(/<summary[^>]*>[\s\S]*?<\/summary>/gi, '');
+            finalStr = finalStr.replace(/```[\s\S]*?```/g, ''); // 문자로만 남은 백틱도 삭제
+            
+            finalStr = finalStr.replace(/\n{3,}/g, '\n\n').trim();
+            
+            editor.focus();
+            document.execCommand('selectAll', false, null);
+            document.execCommand('insertText', false, finalStr);
+        }
+
+        function applyMarkdown() {
+            if (savedSelectionRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedSelectionRange);
+            }
+
+            const sel = window.getSelection();
+            // 선택된 텍스트가 없으면 경고창 후 작동 중지
+            if (!sel.rangeCount || sel.isCollapsed) {
+                alert("마크다운을 적용할 텍스트를 드래그하여 선택해주세요.");
+                return;
+            }
+
+            let rawText = sel.toString();
+            if (!rawText.trim()) return;
+
+            rawText = rawText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+            marked.setOptions({ breaks: true, gfm: true });
+            let html = marked.parse(rawText);
+            
+            html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
+            if(html.endsWith('<br>')) html = html.slice(0, -4); // marked가 생성하는 마지막 줄바꿈 제거
+
+            // 선택된 영역에만 변환된 HTML 덮어쓰기 (요청 반영)
+            document.execCommand('insertHTML', false, html);
+        }
+        
+        // 텍스트 블러 처리 기능
+        function applyBlurToText() {
+            if (savedSelectionRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedSelectionRange);
+            }
+
+            const sel = window.getSelection();
+            // 선택된 텍스트가 없으면 경고창 후 작동 중지
+            if (!sel.rangeCount || sel.isCollapsed) {
+                alert("흐리게(블러) 처리할 텍스트를 드래그하여 선택해주세요.");
+                return;
+            }
+            
+            // 현재 선택된 영역의 부모를 찾아 실제 적용된 글자색을 가져옵니다 (currentColor 버그 방지)
+            let targetColor = currentTextColor;
+            const parentNode = sel.getRangeAt(0).commonAncestorContainer;
+            const parentEl = parentNode.nodeType === 3 ? parentNode.parentNode : parentNode;
+            
+            if (parentEl && parentEl.nodeType === 1) {
+                const computedColor = window.getComputedStyle(parentEl).color;
+                if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
+                    targetColor = computedColor;
+                }
+            }
+
+            const html = sel.getRangeAt(0).cloneContents();
+            const div = document.createElement('div');
+            div.appendChild(html);
+
+            // html2canvas가 em 단위를 무시하는 버그가 있으므로 반드시 px 단위를 사용 (5px로 강하게)
+            // 줄바꿈 유지를 위해 SVG 대신 HTML text-shadow를 사용하되 rgba로 투명도(0.01)를 줘서 렌더링 강제
+            const blurredHTML = `<span class="blur-effect" style="color: rgba(0, 0, 0, 0.01) !important; text-shadow: 0px 0px 5px ${targetColor} !important; user-select: none;">${div.innerHTML}</span>`;
+            
+            document.execCommand('insertHTML', false, blurredHTML);
+        }
+
+        function execCmd(command, value = null) {
+            if (savedSelectionRange && command !== 'undo' && command !== 'redo') {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedSelectionRange);
+            }
+
+            if(command.startsWith('justify')) {
+                document.querySelectorAll('button[title*="정렬"]').forEach(b => b.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+                
+                const editor = document.getElementById('editor');
+                if(command === 'justifyLeft') editor.style.textAlign = 'left';
+                if(command === 'justifyCenter') editor.style.textAlign = 'center';
+                if(command === 'justifyRight') editor.style.textAlign = 'right';
+                if(command === 'justifyFull') editor.style.textAlign = 'justify';
+            }
+            
+            document.execCommand(command, false, value);
+            document.getElementById('editor').focus();
+        }
+
+        function clearFormatting() {
+            document.execCommand('removeFormat', false, null);
+            document.execCommand('backColor', false, 'transparent');
+            document.execCommand('foreColor', false, currentTextColor);
+            
+            // 블러 효과 지우기
+            const editor = document.getElementById('editor');
+            const blurs = editor.querySelectorAll('.blur-effect');
+            blurs.forEach(el => {
+                const parent = el.parentNode;
+                while(el.firstChild) parent.insertBefore(el.firstChild, el);
+                parent.removeChild(el);
+            });
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+            document.getElementById('previewContainer').innerHTML = ''; 
+        }
+
+        function findSafeCutY(ctx, width, startY, targetHeight, minHeight) {
+            if (startY + targetHeight >= ctx.canvas.height) {
+                return ctx.canvas.height - startY;
+            }
+            
+            const checkHeight = Math.floor(targetHeight - minHeight);
+            if (checkHeight <= 0) return targetHeight;
+            
+            const imgData = ctx.getImageData(0, startY + minHeight, width, checkHeight);
+            const data = imgData.data;
+            
+            for (let y = checkHeight - 1; y >= 0; y--) {
+                let isBlank = true;
+                for (let x = 0; x < width; x += 8) {
+                    const i = (y * width + x) * 4;
+                    // 알파 채널이 거의 투명하면 글씨가 없는 것으로 간주
+                    if (data[i+3] > 10) {
+                        isBlank = false;
+                        break;
+                    }
+                }
+                if (isBlank) return minHeight + y; 
+            }
+            return targetHeight; 
+        }
+        
+        function mixHexColors(c1, c2, percent) {
+            const parse = c => {
+                let hex = c.replace('#', '');
+                if (hex.length === 3) hex = hex.split('').map(x => x+x).join('');
+                return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+            };
+            const [r1, g1, b1] = parse(c1);
+            const [r2, g2, b2] = parse(c2);
+            const p = percent / 100;
+            const r = Math.round(r1 + (r2 - r1) * p).toString(16).padStart(2, '0');
+            const g = Math.round(g1 + (g2 - g1) * p).toString(16).padStart(2, '0');
+            const b = Math.round(b1 + (b2 - b1) * p).toString(16).padStart(2, '0');
+            return `#${r}${g}${b}`;
+        }
+
+        async function generatePreview() {
+            const sidebar = document.getElementById('sidebar');
+            if(window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+
+            const modal = document.getElementById('previewModal');
+            const statusText = document.getElementById('previewStatus');
+            const container = document.getElementById('previewContainer');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const wrapper = document.getElementById('export-wrapper');
+            
+            const autoTrim = document.getElementById('autoTrim').checked;
+            const originalMinHeight = wrapper.style.minHeight;
+            const bgMode = document.querySelector('input[name="bgMode"]:checked').value;
+            const originalBg = wrapper.style.background;
+            
+            previewImages = [];
+            container.innerHTML = '';
+            
+            statusText.innerText = "이미지를 생성하는 중...";
+            downloadBtn.classList.add('hidden');
+            modal.classList.remove('hidden');
+
+            document.getElementById('editor').blur();
+            if (autoTrim) wrapper.style.minHeight = '0px'; 
+            
+            // 그라데이션 및 정확한 자르기를 위해 배경을 일시적으로 투명하게 만듦
+            wrapper.style.background = 'transparent';
+
+            try {
+                await new Promise(r => setTimeout(r, 150));
+
+                const fullCanvas = await modernScreenshot.domToCanvas(wrapper, {
+                    scale: 4,
+                    backgroundColor: 'transparent',
+                    width: wrapper.scrollWidth,
+                    height: wrapper.scrollHeight
+                });
+
+                // 캡처 후 배경 원복
+                wrapper.style.background = originalBg;
+
+                const fullCtx = fullCanvas.getContext('2d');
+                const ratioVal = document.getElementById('imageRatio').value;
+                const unscaledWidth = wrapper.offsetWidth;
+                const totalHeight = fullCanvas.height;
+                const width = fullCanvas.width;
+                
+                const padTopPx = parseInt(document.getElementById('paddingTop').value) * 4;
+                const padBottomPx = parseInt(document.getElementById('paddingBottom').value) * 4;
+                
+                let domElements = []; 
+
+                if (ratioVal === 'auto') {
+                    const sliceCanvas = document.createElement('canvas');
+                    sliceCanvas.width = width;
+                    sliceCanvas.height = totalHeight;
+                    const ctx = sliceCanvas.getContext('2d');
+                    
+                    // 배경 채우기
+                    if (bgMode === 'gradient') {
+                        const dir = document.getElementById('gradDirection').value;
+                        const gradPos = document.getElementById('gradPos').value;
+                        let grad;
+                        if (dir === 'to right') grad = ctx.createLinearGradient(0, 0, width, 0);
+                        else if (dir === 'to bottom right') grad = ctx.createLinearGradient(0, 0, width, totalHeight);
+                        else if (dir === 'to top right') grad = ctx.createLinearGradient(0, totalHeight, width, 0);
+                        else grad = ctx.createLinearGradient(0, 0, 0, totalHeight); 
+                        
+                        grad.addColorStop(0, gradColor1);
+                        grad.addColorStop(gradPos / 100, mixHexColors(gradColor1, gradColor2, 50));
+                        grad.addColorStop(1, gradColor2);
+                        ctx.fillStyle = grad;
+                    } else {
+                        ctx.fillStyle = currentBgColor;
+                    }
+                    ctx.fillRect(0, 0, width, totalHeight);
+                    
+                    // 원본 콘텐츠 그리기
+                    ctx.drawImage(fullCanvas, 0, 0);
+                    
+                    const imgUrl = sliceCanvas.toDataURL("image/png", 1.0);
+                    previewImages.push(imgUrl);
+
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.className = "flex flex-col items-center w-full";
+                    
+                    const imgEl = document.createElement('img');
+                    imgEl.src = imgUrl;
+                    imgEl.className = "w-full max-w-[450px] shadow-2xl rounded border border-gray-700 transition-transform hover:scale-[1.02]"; 
+                    
+                    const pageNum = document.createElement('div');
+                    pageNum.className = "text-gray-400 text-xs mt-3 mb-1 font-mono tracking-widest";
+                    pageNum.innerText = `[ 전체 1장 캡처됨 ]`;
+
+                    imgWrapper.appendChild(imgEl);
+                    imgWrapper.appendChild(pageNum);
+                    container.appendChild(imgWrapper);
+                } else {
+                    const ratioMultiplier = parseFloat(ratioVal);
+                    const unscaledTargetHeight = Math.floor(unscaledWidth * ratioMultiplier);
+                    const SLICE_HEIGHT = unscaledTargetHeight * 4; 
+                    
+                    let currentY = 0;
+                    let isFirstPage = true;
+
+                    while (currentY < totalHeight) {
+                        let availableContentH = SLICE_HEIGHT;
+                        let drawOffsetY = 0;
+
+                        if (isFirstPage) {
+                            drawOffsetY = 0;
+                            availableContentH = SLICE_HEIGHT - padBottomPx; 
+                        } else {
+                            drawOffsetY = padTopPx; 
+                            availableContentH = SLICE_HEIGHT - (padTopPx + padBottomPx); 
+                        }
+
+                        let sliceHeightToDraw = availableContentH;
+                        
+                        if (currentY + sliceHeightToDraw >= totalHeight) {
+                            sliceHeightToDraw = totalHeight - currentY;
+                        } else {
+                            // 투명 바탕에서 알파 채널을 통해 빈 공간 확인
+                            sliceHeightToDraw = findSafeCutY(fullCtx, width, currentY, sliceHeightToDraw, availableContentH * 0.5);
+                        }
+                        
+                        let ACTUAL_SLICE_HEIGHT = SLICE_HEIGHT;
+                        let isLastPage = (currentY + sliceHeightToDraw >= totalHeight);
+                        
+                        if (autoTrim && isLastPage) {
+                            ACTUAL_SLICE_HEIGHT = drawOffsetY + sliceHeightToDraw;
+                        }
+
+                        const sliceCanvas = document.createElement('canvas');
+                        sliceCanvas.width = width;
+                        sliceCanvas.height = ACTUAL_SLICE_HEIGHT;
+                        const ctx = sliceCanvas.getContext('2d');
+                        
+                        // 페이지마다 개별적인 그라데이션 적용
+                        if (bgMode === 'gradient') {
+                            const dir = document.getElementById('gradDirection').value;
+                            const gradPos = document.getElementById('gradPos').value;
+                            let grad;
+                            if (dir === 'to right') grad = ctx.createLinearGradient(0, 0, width, 0);
+                            else if (dir === 'to bottom right') grad = ctx.createLinearGradient(0, 0, width, ACTUAL_SLICE_HEIGHT);
+                            else if (dir === 'to top right') grad = ctx.createLinearGradient(0, ACTUAL_SLICE_HEIGHT, width, 0);
+                            else grad = ctx.createLinearGradient(0, 0, 0, ACTUAL_SLICE_HEIGHT); 
+                            
+                            grad.addColorStop(0, gradColor1);
+                            grad.addColorStop(gradPos / 100, mixHexColors(gradColor1, gradColor2, 50));
+                            grad.addColorStop(1, gradColor2);
+                            ctx.fillStyle = grad;
+                        } else {
+                            ctx.fillStyle = currentBgColor;
+                        }
+                        ctx.fillRect(0, 0, width, ACTUAL_SLICE_HEIGHT);
+
+                        // 투명으로 캡처된 원본 글씨 그리기
+                        ctx.drawImage(
+                            fullCanvas,
+                            0, currentY, width, sliceHeightToDraw, 
+                            0, drawOffsetY, width, sliceHeightToDraw
+                        );
+                        
+                        const imgUrl = sliceCanvas.toDataURL("image/png", 1.0);
+                        previewImages.push(imgUrl);
+
+                        const imgWrapper = document.createElement('div');
+                        imgWrapper.className = "flex flex-col items-center w-full";
+                        
+                        const imgEl = document.createElement('img');
+                        imgEl.src = imgUrl;
+                        imgEl.className = "w-full max-w-[450px] shadow-2xl rounded border border-gray-700 transition-transform hover:scale-[1.02]"; 
+                        
+                        const pageNum = document.createElement('div');
+                        pageNum.className = "text-gray-400 text-xs mt-3 mb-1 font-mono tracking-widest";
+                        domElements.push(pageNum);
+
+                        imgWrapper.appendChild(imgEl);
+                        imgWrapper.appendChild(pageNum);
+                        container.appendChild(imgWrapper);
+                        
+                        currentY += sliceHeightToDraw;
+                        isFirstPage = false;
+                    }
+                    
+                    domElements.forEach((el, idx) => {
+                        el.innerText = `[ PAGE ${idx + 1} / ${domElements.length} ]`;
+                    });
+                }
+                
+                statusText.innerText = "이미지 생성이 완료되었습니다.";
+                downloadBtn.classList.remove('hidden');
+                
+            } catch (err) {
+                console.error(err);
+                statusText.innerText = "오류가 발생했습니다. 새로고침 해주세요.";
+            } finally {
+                wrapper.style.background = originalBg; // 혹시나 에러 났을 때 원복
+                if (autoTrim) wrapper.style.minHeight = originalMinHeight || '200px';
+            }
+        }
+
+        async function downloadAllImages() {
+            if (previewImages.length === 0) return;
+            
+            const timestamp = new Date().getTime();
+            const dlOrder = document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward';
+            
+            // 이미지 배열에 순서 정보 추가
+            let dlList = previewImages.map((url, idx) => ({ url, num: idx + 1 }));
+            
+            if (dlOrder === 'reverse') {
+                dlList.reverse();
+            }
+
+            const padLen = previewImages.length.toString().length;
+
+            for (let i = 0; i < dlList.length; i++) {
+                const item = dlList[i];
+                const paddedNum = item.num.toString().padStart(padLen, '0');
+                
+                const link = document.createElement('a');
+                link.download = `발췌본_${timestamp}_${paddedNum}.png`;
+                link.href = item.url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 순서 꼬임을 방지하기 위한 강제 시간 지연
+                await new Promise(r => setTimeout(r, 600));
+            }
+            closePreview();
+        }
+
+        function updatePresetList() {
+            const select = document.getElementById('presetSelect');
+            let presets = JSON.parse(localStorage.getItem('logPresets') || '{}');
+            select.innerHTML = '';
+            const keys = Object.keys(presets);
+            if (keys.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.text = "저장된 프리셋 없음";
+                select.appendChild(opt);
+            } else {
+                keys.forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.text = key;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function savePreset() {
+            const name = prompt("저장할 프리셋 이름을 입력하세요:");
+            if (!name) return;
+
+            const bgMode = document.querySelector('input[name="bgMode"]:checked').value;
+
+            const preset = {
+                font: document.getElementById('globalFont').value,
+                fontSize: document.getElementById('globalFontSize').value,
+                lineHeight: document.getElementById('globalLineHeight').value,
+                letterSpacing: document.getElementById('globalLetterSpacing').value,
+                wordBreak: document.getElementById('globalWordBreak').value,
+                indent: document.getElementById('globalIndent').checked,
+                padding: document.getElementById('globalPadding').value,
+                paddingTop: document.getElementById('paddingTop').value,
+                paddingBottom: document.getElementById('paddingBottom').value,
+                paddingLeft: document.getElementById('paddingLeft').value,
+                paddingRight: document.getElementById('paddingRight').value,
+                
+                bgMode: bgMode,
+                bgColor: currentBgColor,
+                gradColor1: gradColor1,
+                gradColor2: gradColor2,
+                gradDirection: document.getElementById('gradDirection').value,
+                gradPos: document.getElementById('gradPos').value,
+                
+                textColor: currentTextColor,
+                texture: document.getElementById('paperTexture').value,
+                ratio: document.getElementById('imageRatio').value,
+                quoteStyle: document.getElementById('quoteStyle').value,
+                autoTrim: document.getElementById('autoTrim').checked,
+                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward'
+            };
+
+            let presets = JSON.parse(localStorage.getItem('logPresets') || '{}');
+            presets[name] = preset;
+            localStorage.setItem('logPresets', JSON.stringify(presets));
+            updatePresetList();
+            
+            document.getElementById('presetSelect').value = name;
+            alert(`'${name}' 프리셋이 저장되었습니다.`);
+        }
+
+        function applySettingsObject(preset) {
+            if (!preset) return;
+            document.getElementById('globalFont').value = preset.font || "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+            document.getElementById('globalFontSize').value = preset.fontSize || "10px";
+            document.getElementById('globalLineHeight').value = preset.lineHeight || "1.8";
+            document.getElementById('globalLetterSpacing').value = preset.letterSpacing || "-0.5";
+            document.getElementById('globalWordBreak').value = preset.wordBreak || "keep-all";
+            document.getElementById('globalIndent').checked = preset.indent || false;
+            
+            document.getElementById('globalPadding').value = preset.padding || "40";
+            document.getElementById('paddingTop').value = preset.paddingTop || "40";
+            document.getElementById('paddingBottom').value = preset.paddingBottom || "40";
+            document.getElementById('paddingLeft').value = preset.paddingLeft || "40";
+            document.getElementById('paddingRight').value = preset.paddingRight || "40";
+            
+            document.getElementById('globalPaddingVal').innerText = (preset.padding || "40") + 'px';
+            document.getElementById('paddingTopVal').innerText = (preset.paddingTop || "40") + 'px';
+            document.getElementById('paddingBottomVal').innerText = (preset.paddingBottom || "40") + 'px';
+            document.getElementById('paddingLeftVal').innerText = (preset.paddingLeft || "40") + 'px';
+            document.getElementById('paddingRightVal').innerText = (preset.paddingRight || "40") + 'px';
+
+            document.getElementById('paperTexture').value = preset.texture || "none";
+            document.getElementById('imageRatio').value = preset.ratio || "1.5";
+            document.getElementById('quoteStyle').value = preset.quoteStyle || "smart";
+            document.getElementById('autoTrim').checked = preset.autoTrim !== undefined ? preset.autoTrim : true;
+            
+            if(preset.downloadOrder && document.querySelector(`input[name="dlOrder"][value="${preset.downloadOrder}"]`)) {
+                document.querySelector(`input[name="dlOrder"][value="${preset.downloadOrder}"]`).checked = true;
+            }
+
+            const mode = preset.bgMode || 'solid';
+            if (document.querySelector(`input[name="bgMode"][value="${mode}"]`)) {
+                document.querySelector(`input[name="bgMode"][value="${mode}"]`).checked = true;
+                toggleBgMode();
+            }
+
+            if (preset.gradPos) {
+                document.getElementById('gradPos').value = preset.gradPos;
+                if(document.getElementById('gradPosVal')) document.getElementById('gradPosVal').innerText = preset.gradPos;
+            }
+
+            gradColor1 = preset.gradColor1 || '#fbcfe8';
+            gradColor2 = preset.gradColor2 || '#93c5fd';
+            if(gradPickr1) { isSyncingGrad1 = true; gradPickr1.setColor(gradColor1); isSyncingGrad1 = false; }
+            if(gradPickr2) { isSyncingGrad2 = true; gradPickr2.setColor(gradColor2); isSyncingGrad2 = false; }
+            document.getElementById('gradDirection').value = preset.gradDirection || 'to bottom';
+
+            // 그라데이션 프리셋 활성화 해제 및 기본값 갱신
+            const gradSiblings = document.querySelectorAll('.color-swatch[data-type="grad"]');
+            gradSiblings.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('data-c1').toLowerCase() === gradColor1.toLowerCase() && btn.getAttribute('data-c2').toLowerCase() === gradColor2.toLowerCase()) {
+                    btn.classList.add('active');
+                }
+            });
+
+            applyCustomColor('bg', preset.bgColor || "#ffffff");
+            applyCustomColor('text', preset.textColor || "#111111");
+            
+            toggleTexture();
+            updateGlobalStyles();
+        }
+
+        function loadPreset() {
+            const name = document.getElementById('presetSelect').value;
+            if (!name) return;
+
+            let presets = JSON.parse(localStorage.getItem('logPresets') || '{}');
+            const preset = presets[name];
+            if (preset) {
+                applySettingsObject(preset);
+            }
+        }
+
+        function deletePreset() {
+            const name = document.getElementById('presetSelect').value;
+            if (!name) return;
+            
+            if(confirm(`'${name}' 프리셋을 삭제하시겠습니까?`)) {
+                let presets = JSON.parse(localStorage.getItem('logPresets') || '{}');
+                delete presets[name];
+                localStorage.setItem('logPresets', JSON.stringify(presets));
+                updatePresetList();
+            }
+        }
+        
+       // 툴 초기화
+       document.getElementById('customBgHex').value = currentBgColor;
+       document.getElementById('customTextHex').value = currentTextColor;
+       updatePresetList();
+
+    </script>
+</body>
+</html>
+
+
