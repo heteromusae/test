@@ -119,16 +119,15 @@
             margin: 0 auto;
         }
 
-        /* 스포일러 박스 (클래스 분리 적용 및 baseline 수정) */
-        .spoiler-box {
+        /* 텍스트 섀도우를 이용한 블러 처리 */
+        .blur-text {
             color: transparent;
-            border-radius: 2px;
-            line-height: inherit;
-            vertical-align: baseline;
-        }
-        .spoiler-box::selection {
-            background-color: rgba(255, 255, 255, 0.3);
-            color: inherit;
+            text-shadow:
+                0 0 3px currentColor,
+                0 0 6px currentColor,
+                0 0 9px currentColor,
+                0 0 12px currentColor;
+            user-select: none;
         }
     </style>
 </head>
@@ -150,7 +149,7 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900 mb-1">⚙️ 텍스트 자동 변환</h3>
-                    <p><b>일괄 변환:</b> 별표로 감싸지지 않은 일반 텍스트 문단에 지정한 따옴표를 입히고, 지문에 붙은 별표를 모두 삭제합니다.<br>
+                    <p><b>일괄 변환:</b> 별표로 감싸지지 일반 텍스트 문단에 지정한 따옴표를 입히고, 지문에 붙은 별표를 모두 삭제합니다.<br>
                     <b>웹 서식 정리:</b> 외부에서 복사한 HTML 코드를 정리하여 불필요한 태그와 스타일은 지우고 텍스트만 깔끔하게 보존합니다.<br>
                     <b>🔍 치환 기능:</b> 상단 툴바의 버튼을 통해 문서 내 특정 텍스트를 다른 텍스트로 일괄 치환합니다.</p>
                 </div>
@@ -631,8 +630,8 @@
             <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('underline')" title="밑줄"><u class="text-base font-serif">U</u></button>
             <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('strikeThrough')" title="취소선"><s class="text-base font-serif">S</s></button>
             
-            <!-- 스포일러 버튼 (눈 가리기 아이콘) -->
-            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applySpoilerBox()" title="글씨 가리기 (스포일러 박스)">
+            <!-- 블러 버튼 (text-shadow 활용) -->
+            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyBlurText()" title="흐리게 블러 처리">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
             </button>
 
@@ -1095,12 +1094,6 @@
                 wrapper.style.background = `linear-gradient(${dir}, ${gradColor1}, ${gradPos}%, ${gradColor2})`;
             }
 
-            // 스포일러 박스들의 배경색을 현재 글자색으로 동기화 (색상 변경은 인라인 스타일로 유지)
-            const spoilers = editor.querySelectorAll('.spoiler-box');
-            spoilers.forEach(el => {
-                el.style.backgroundColor = currentTextColor;
-            });
-
             saveAutoSettings();
         }
 
@@ -1316,7 +1309,8 @@
             document.execCommand('insertHTML', false, html);
         }
         
-        function applySpoilerBox() {
+        // text-shadow를 활용한 블러 적용 기능
+        function applyBlurText() {
             if (savedSelectionRange) {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
@@ -1325,7 +1319,7 @@
 
             const sel = window.getSelection();
             if (!sel.rangeCount || sel.isCollapsed) {
-                alert("가릴 텍스트를 드래그하여 선택해주세요.");
+                alert("블러 처리할 텍스트를 드래그하여 선택해주세요.");
                 return;
             }
 
@@ -1333,10 +1327,9 @@
             const div = document.createElement('div');
             div.appendChild(html);
 
-            // 클래스 분리. 배경색은 동적이므로 인라인 스타일 유지.
-            const spoilerHTML = `<span class="spoiler-box" style="background-color: ${currentTextColor};">${div.innerHTML}</span>`;
+            const blurHTML = `<span class="blur-text">${div.innerHTML}</span>`;
             
-            document.execCommand('insertHTML', false, spoilerHTML);
+            document.execCommand('insertHTML', false, blurHTML);
         }
 
         function execCmd(command, value = null) {
@@ -1378,12 +1371,12 @@
             document.execCommand('removeFormat', false, null);
             document.execCommand('backColor', false, 'transparent');
             
-            // 2. 선택된 범위 내의 스포일러 박스 해제
+            // 2. 선택된 범위 내의 블러 텍스트 해제
             const range = sel.getRangeAt(0);
             const editor = document.getElementById('editor');
-            const spoilers = editor.querySelectorAll('.spoiler-box');
+            const blurs = editor.querySelectorAll('.blur-text');
             
-            spoilers.forEach(el => {
+            blurs.forEach(el => {
                 if (sel.containsNode(el, true)) {
                     const parent = el.parentNode;
                     while(el.firstChild) {
@@ -1832,4 +1825,3 @@
     </script>
 </body>
 </html>
-
