@@ -758,7 +758,6 @@
         let gradColor1 = '#fbcfe8';
         let gradColor2 = '#93c5fd';
 
-        // Pickr의 change 이벤트 무한루프를 제어하는 상태 플래그
         let isSyncingBg = false;
         let isSyncingText = false;
         let isSyncingGrad1 = false;
@@ -767,7 +766,6 @@
         let previewImages = [];
         let savedSelectionRange = null;
 
-        // Pickr 설정 공통 옵션
         const pickrConfig = {
             theme: 'classic',
             swatches: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#111111', '#ffffff'],
@@ -825,14 +823,12 @@
                 if(!isSyncingGrad2) { gradColor2 = color.toHEXA().toString(); updateGlobalStyles(); } 
             });
 
-            // 자동 저장 내역 로드 (팝업 없이 자동)
             const savedLog = localStorage.getItem('autoSavedLog');
             const editorNode = document.getElementById('editor');
             if (savedLog && savedLog.trim() !== '' && savedLog.trim() !== '이곳에 발췌할 로그를 붙여넣으세요.') {
                 editorNode.innerHTML = savedLog;
             }
 
-            // 자동 설정 로드
             const autoSettings = JSON.parse(localStorage.getItem('autoSavedSettings'));
             if (autoSettings) {
                 applySettingsObject(autoSettings);
@@ -939,7 +935,6 @@
             applyCustomColor(type, color);
         }
 
-        // 그라데이션 프리셋 적용
         function setGradPreset(buttonElement, c1, c2) {
             const siblings = document.querySelectorAll('.color-swatch[data-type="grad"]');
             siblings.forEach(btn => btn.classList.remove('active'));
@@ -1323,42 +1318,14 @@
                 alert("흐리게(블러) 처리할 텍스트를 드래그하여 선택해주세요.");
                 return;
             }
-            
-            let targetColor = currentTextColor;
-            const parentNode = sel.getRangeAt(0).commonAncestorContainer;
-            const parentEl = parentNode.nodeType === 3 ? parentNode.parentNode : parentNode;
-            
-            if (parentEl && parentEl.nodeType === 1) {
-                const computedColor = window.getComputedStyle(parentEl).color;
-                if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
-                    targetColor = computedColor;
-                }
-            }
-
-            // [추가] 텍스트 자체를 투명하게 만들지 않고, 배경색과 똑같은 색상으로 덮어씌우는 계산 로직
-            let hideColor = currentBgColor;
-            const bgMode = document.querySelector('input[name="bgMode"]:checked').value;
-            if (bgMode === 'gradient') {
-                hideColor = mixHexColors(gradColor1, gradColor2, document.getElementById('gradPos').value);
-            }
 
             const html = sel.getRangeAt(0).cloneContents();
             const div = document.createElement('div');
             div.appendChild(html);
 
-            // [핵심 버그픽스] 
-            // html2canvas가 중첩 태그의 색상을 살려내서 렌더링하는 버그를 막기 위해
-            // 모든 내부 태그의 색상을 배경색(hideColor)으로 강제 덮어버리고 그림자를 주입합니다.
-            const elements = div.querySelectorAll('*');
-            elements.forEach(el => {
-                if (el.style !== undefined) {
-                    el.style.setProperty('color', hideColor, 'important');
-                    el.style.setProperty('text-shadow', `0px 0px 6px ${targetColor}`, 'important');
-                }
-            });
-
-            // 투명색(transparent) 꼼수를 폐기하고, 글씨를 배경과 동일한 색으로 만들어 완벽히 렌더링되게 수정
-            const blurredHTML = `<span class="blur-effect" style="color: ${hideColor} !important; text-shadow: 0px 0px 6px ${targetColor} !important; user-select: none;">${div.innerHTML}</span>`;
+            // [핵심 변경 1] 모든 투명화, 섀도우 강제 주입 꼼수를 버리고 오직 시각적인 CSS 블러 속성만 적용합니다.
+            // 캡처 시에는 이 요소를 숨기고 캔버스에 직접 텍스트를 다시 그리는 방식으로 100% 깔끔하게 처리됩니다.
+            const blurredHTML = `<span class="blur-effect" style="filter: blur(4px); opacity: 0.85; user-select: none;">${div.innerHTML}</span>`;
             
             document.execCommand('insertHTML', false, blurredHTML);
         }
@@ -1393,17 +1360,6 @@
             const editor = document.getElementById('editor');
             const blurs = editor.querySelectorAll('.blur-effect');
             blurs.forEach(el => {
-                const innerEls = el.querySelectorAll('*');
-                innerEls.forEach(innerEl => {
-                    if (innerEl.style !== undefined) {
-                        innerEl.style.removeProperty('color');
-                        innerEl.style.removeProperty('text-shadow');
-                        if (innerEl.getAttribute('style') === '') {
-                            innerEl.removeAttribute('style');
-                        }
-                    }
-                });
-
                 const parent = el.parentNode;
                 while(el.firstChild) parent.insertBefore(el.firstChild, el);
                 parent.removeChild(el);
@@ -1484,9 +1440,37 @@
             
             wrapper.style.background = 'transparent';
 
-            // [오류 수정] 캔버스 강제 후처리 및 레이아웃을 망가뜨리는 DOM 수집 로직(blurRects) 삭제
+            // [핵심 변경 2] 캡처 직전에 블러 대상 요소들의 원본 텍스트 데이터와 정확한 좌표, 폰트 스타일을 미리 수집합니다.
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const blurInfos = [];
+            
+            wrapper.querySelectorAll('.blur-effect').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const compStyle = window.getComputedStyle(el);
+                
+                // 적용된 실제 글자색 추출
+                let tColor = currentTextColor;
+                if (compStyle.color && compStyle.color !== 'rgba(0, 0, 0, 0)' && compStyle.color !== 'transparent') {
+                    tColor = compStyle.color;
+                }
+
+                blurInfos.push({
+                    text: el.textContent, // 순수 텍스트 내용만 추출
+                    x: rect.left - wrapperRect.left,
+                    y: rect.top - wrapperRect.top,
+                    w: rect.width,
+                    h: rect.height,
+                    fontFamily: compStyle.fontFamily,
+                    fontSize: parseFloat(compStyle.fontSize),
+                    fontWeight: compStyle.fontWeight,
+                    fontStyle: compStyle.fontStyle,
+                    color: tColor,
+                    letterSpacing: compStyle.letterSpacing === 'normal' ? 0 : parseFloat(compStyle.letterSpacing)
+                });
+            });
 
             try {
+                // 브라우저 렌더링 합성을 기다리기 위해 여유 시간을 둡니다.
                 await new Promise(r => setTimeout(r, 200));
 
                 const fullCanvas = await html2canvas(wrapper, {
@@ -1495,15 +1479,50 @@
                     useCORS: true,
                     logging: false,
                     allowTaint: true,
-                    // [오류 수정] CSS 필터를 파괴하는 주범인 letterRendering 옵션을 삭제하여 순수 렌더링 유지
+                    // 오류 주범이었던 letterRendering은 삭제합니다.
                     windowWidth: wrapper.scrollWidth,
-                    windowHeight: wrapper.scrollHeight
+                    windowHeight: wrapper.scrollHeight,
+                    // [핵심 변경 3] 캡처 과정에서 블러 대상 텍스트를 아예 숨겨서(투명) 배경이 완벽히 깔끔하게 캡처되도록 합니다.
+                    onclone: (doc) => {
+                        doc.querySelectorAll('.blur-effect').forEach(el => {
+                            el.style.opacity = '0';
+                            el.style.visibility = 'hidden';
+                        });
+                    }
                 });
 
-                // 캡처 후 배경 원복
+                // 캡처 후 원본 배경 원복
                 wrapper.style.background = originalBg;
 
                 const fullCtx = fullCanvas.getContext('2d');
+                const scale = 4;
+
+                // [핵심 변경 4] 수집했던 텍스트 정보를 캔버스 API를 통해 그 자리에 1:1로 직접 덮어 그립니다.
+                if (blurInfos.length > 0) {
+                    fullCtx.filter = `blur(${4 * scale}px)`; // 네이티브 캔버스 블러 적용
+                    fullCtx.textBaseline = 'middle';
+                    fullCtx.textAlign = 'left';
+
+                    blurInfos.forEach(info => {
+                        fullCtx.fillStyle = info.color;
+                        fullCtx.font = `${info.fontStyle} ${info.fontWeight} ${info.fontSize * scale}px ${info.fontFamily}`;
+
+                        if ('letterSpacing' in fullCtx) {
+                            fullCtx.letterSpacing = (info.letterSpacing * scale) + 'px';
+                        }
+
+                        // 수집된 bounding box의 세로 중앙에 텍스트를 정확히 배치합니다. (좌표 어긋남 방지)
+                        const cx = info.x * scale;
+                        const cy = (info.y + info.h / 2) * scale;
+
+                        fullCtx.fillText(info.text, cx, cy);
+                    });
+
+                    // 블러 초기화
+                    fullCtx.filter = 'none';
+                    if ('letterSpacing' in fullCtx) fullCtx.letterSpacing = '0px';
+                }
+
                 const ratioVal = document.getElementById('imageRatio').value;
                 const unscaledWidth = wrapper.offsetWidth;
                 const totalHeight = fullCanvas.height;
