@@ -9,7 +9,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- html2canvas (안정성을 위해 롤백) -->
+    <!-- html2canvas (가장 안정적인 렌더러로 롤백) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Marked.js (마크다운 파싱용) -->
@@ -741,7 +741,6 @@
         <!-- 스크롤 본문 -->
         <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start relative" id="scroll-area">
             
-            <!-- 트랜지션 클래스 제거하여 빠른 반영을 돕도록 수정 -->
             <div id="export-wrapper" class="w-full max-w-[500px] bg-white relative">
                 <!-- 종이 질감 오버레이 -->
                 <div id="texture-overlay" class="absolute inset-0 z-10 pointer-events-none opacity-0"></div>
@@ -955,7 +954,6 @@
             updateGlobalStyles();
         }
 
-        // Pickr 버튼의 UI까지 정상적으로 변경될 수 있도록 수정
         function applyCustomColor(type, value, fromPickr = false) {
             const siblings = document.querySelectorAll(`.color-swatch[data-type="${type}"]`);
             siblings.forEach(btn => btn.classList.remove('active'));
@@ -965,7 +963,6 @@
                 hex = '#' + hex;
             }
             
-            // 일치하는 색상 버튼이 있으면 활성화
             siblings.forEach(btn => {
                 if(btn.getAttribute('data-color').toLowerCase() === hex.toLowerCase()) {
                     btn.classList.add('active');
@@ -1034,7 +1031,6 @@
             document.getElementById('gradDirection').value = "to bottom";
             document.getElementById('gradPos').value = "50";
 
-            // 그라데이션 프리셋 활성화 해제 및 기본값 갱신
             const gradSiblings = document.querySelectorAll('.color-swatch[data-type="grad"]');
             gradSiblings.forEach(btn => {
                 btn.classList.remove('active');
@@ -1090,7 +1086,6 @@
                 editor.classList.remove('indent-active');
             }
 
-            // 배경 모드 처리
             const bgMode = document.querySelector('input[name="bgMode"]:checked').value;
             if (bgMode === 'solid') {
                 wrapper.style.background = currentBgColor;
@@ -1162,7 +1157,7 @@
             
             let newLines = lines.map(line => {
                 let trimmed = line.trim();
-                if (!trimmed) return null; // 빈 줄 표시
+                if (!trimmed) return null; 
                 
                 let isWrapped = trimmed.startsWith('*') && trimmed.endsWith('*');
                 let cleaned = trimmed.replace(/\*/g, '').trim();
@@ -1188,13 +1183,11 @@
             document.execCommand('insertText', false, finalString);
         }
 
-        // 위아래 불필요한 공백, 빈 줄, 빈 태그들을 완전히 지우는 기능 추가
         function trimEmptyLines() {
             const editor = document.getElementById('editor');
             const clone = editor.cloneNode(true);
             let changed = false;
             
-            // 앞쪽 빈 줄/공백 제거
             while(clone.firstChild) {
                 let node = clone.firstChild;
                 let isNodeEmpty = false;
@@ -1215,7 +1208,6 @@
                 }
             }
             
-            // 뒤쪽 빈 줄/공백 제거
             while(clone.lastChild) {
                 let node = clone.lastChild;
                 let isNodeEmpty = false;
@@ -1246,11 +1238,9 @@
             }
         }
 
-        // HTML 및 히든 블록 완전 제거 
         function cleanHtmlAndHidden() {
             const editor = document.getElementById('editor');
             
-            // 1. DOM 내부의 details와 summary 노드를 자식 내용까지 통째로 삭제
             const detailsElements = editor.querySelectorAll('details');
             detailsElements.forEach(el => el.remove());
             const summaryElements = editor.querySelectorAll('summary');
@@ -1266,11 +1256,9 @@
             
             let rawText = editor.innerHTML;
             
-            // 2. HTML 문자열 상태에서 정규식으로 통째로 삭제 (내용물 포함)
             rawText = rawText.replace(/<details[^>]*>[\s\S]*?<\/details>/gi, '');
             rawText = rawText.replace(/<summary[^>]*>[\s\S]*?<\/summary>/gi, '');
             
-            // 줄바꿈 보존을 위해 변환
             rawText = rawText.replace(/<\/div>/gi, '\n');
             rawText = rawText.replace(/<\/p>/gi, '\n');
             rawText = rawText.replace(/<br\s*[\/]?>/gi, '\n');
@@ -1278,18 +1266,16 @@
             rawText = rawText.replace(/<!--[\s\S]*?-->/g, ''); 
             rawText = rawText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); 
             rawText = rawText.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ''); 
-            rawText = rawText.replace(/```[\s\S]*?```/g, ''); // 코드블럭 완전 삭제
-            rawText = rawText.replace(/<[^>]+>/g, ''); // 남은 모든 태그 삭제
+            rawText = rawText.replace(/```[\s\S]*?```/g, ''); 
+            rawText = rawText.replace(/<[^>]+>/g, ''); 
             
-            // 디코딩 및 텍스트 추출 ( textarea를 이용해 엔티티 변환 )
             const temp = document.createElement('textarea');
             temp.innerHTML = rawText;
             let finalStr = temp.value;
             
-            // 3. 디코딩 후 텍스트로 숨어있던 태그까지 3차 확인 및 완전 삭제
             finalStr = finalStr.replace(/<details[^>]*>[\s\S]*?<\/details>/gi, '');
             finalStr = finalStr.replace(/<summary[^>]*>[\s\S]*?<\/summary>/gi, '');
-            finalStr = finalStr.replace(/```[\s\S]*?```/g, ''); // 문자로만 남은 백틱도 삭제
+            finalStr = finalStr.replace(/```[\s\S]*?```/g, ''); 
             
             finalStr = finalStr.replace(/\n{3,}/g, '\n\n').trim();
             
@@ -1306,7 +1292,6 @@
             }
 
             const sel = window.getSelection();
-            // 선택된 텍스트가 없으면 경고창 후 작동 중지
             if (!sel.rangeCount || sel.isCollapsed) {
                 alert("마크다운을 적용할 텍스트를 드래그하여 선택해주세요.");
                 return;
@@ -1321,13 +1306,11 @@
             let html = marked.parse(rawText);
             
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
-            if(html.endsWith('<br>')) html = html.slice(0, -4); // marked가 생성하는 마지막 줄바꿈 제거
+            if(html.endsWith('<br>')) html = html.slice(0, -4); 
 
-            // 선택된 영역에만 변환된 HTML 덮어쓰기 (요청 반영)
             document.execCommand('insertHTML', false, html);
         }
         
-        // 텍스트 블러 처리 기능
         function applyBlurToText() {
             if (savedSelectionRange) {
                 const sel = window.getSelection();
@@ -1336,19 +1319,40 @@
             }
 
             const sel = window.getSelection();
-            // 선택된 텍스트가 없으면 경고창 후 작동 중지
             if (!sel.rangeCount || sel.isCollapsed) {
                 alert("흐리게(블러) 처리할 텍스트를 드래그하여 선택해주세요.");
                 return;
             }
             
+            let targetColor = currentTextColor;
+            const parentNode = sel.getRangeAt(0).commonAncestorContainer;
+            const parentEl = parentNode.nodeType === 3 ? parentNode.parentNode : parentNode;
+            
+            if (parentEl && parentEl.nodeType === 1) {
+                const computedColor = window.getComputedStyle(parentEl).color;
+                if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
+                    targetColor = computedColor;
+                }
+            }
+
             const html = sel.getRangeAt(0).cloneContents();
             const div = document.createElement('div');
             div.appendChild(html);
 
-            // 투명 꼼수를 모두 제거하고 가장 깔끔한 기본 CSS 필터로 롤백. 
-            // 실제 이미지 캡처 시엔 캔버스 API로 100% 무조건 블러가 적용되도록 후처리 로직을 추가했습니다.
-            const blurredHTML = `<span class="blur-effect" style="filter: blur(4px); opacity: 0.85; user-select: none;">${div.innerHTML}</span>`;
+            // [핵심 버그픽스] 
+            // 안쪽에 <span style="color: red"> 와 같은 중첩 태그가 있으면 
+            // html2canvas가 이 색상을 렌더링하면서 글자가 선명하게 튀어나옵니다.
+            // 이를 막기 위해 자식으로 존재하는 모든 태그들을 순회하며 색상을 강제로 투명하게 덮어버리고, 그림자 효과를 주입합니다.
+            const elements = div.querySelectorAll('*');
+            elements.forEach(el => {
+                if (el.style !== undefined) {
+                    el.style.setProperty('color', 'rgba(255, 255, 255, 0.01)', 'important');
+                    el.style.setProperty('text-shadow', `0px 0px 6px ${targetColor}`, 'important');
+                }
+            });
+
+            // html2canvas 환경에서 가장 호환성이 높은 그림자(text-shadow) 기반 블러 효과 적용 (letterRendering 옵션 제거 시 100% 동작)
+            const blurredHTML = `<span class="blur-effect" style="color: rgba(255, 255, 255, 0.01) !important; text-shadow: 0px 0px 6px ${targetColor} !important; user-select: none;">${div.innerHTML}</span>`;
             
             document.execCommand('insertHTML', false, blurredHTML);
         }
@@ -1380,10 +1384,21 @@
             document.execCommand('backColor', false, 'transparent');
             document.execCommand('foreColor', false, currentTextColor);
             
-            // 블러 효과 지우기
             const editor = document.getElementById('editor');
             const blurs = editor.querySelectorAll('.blur-effect');
             blurs.forEach(el => {
+                // 내부 요소들에 강제로 주입했던 투명색과 그림자 속성도 함께 제거해줍니다.
+                const innerEls = el.querySelectorAll('*');
+                innerEls.forEach(innerEl => {
+                    if (innerEl.style !== undefined) {
+                        innerEl.style.removeProperty('color');
+                        innerEl.style.removeProperty('text-shadow');
+                        if (innerEl.getAttribute('style') === '') {
+                            innerEl.removeAttribute('style');
+                        }
+                    }
+                });
+
                 const parent = el.parentNode;
                 while(el.firstChild) parent.insertBefore(el.firstChild, el);
                 parent.removeChild(el);
@@ -1410,7 +1425,6 @@
                 let isBlank = true;
                 for (let x = 0; x < width; x += 8) {
                     const i = (y * width + x) * 4;
-                    // 알파 채널이 거의 투명하면 글씨가 없는 것으로 간주
                     if (data[i+3] > 10) {
                         isBlank = false;
                         break;
@@ -1466,24 +1480,9 @@
             // 그라데이션 및 정확한 자르기를 위해 배경을 일시적으로 투명하게 만듦
             wrapper.style.background = 'transparent';
 
-            // 캡처 직전, 블러 영역의 좌표를 문서 크기 대비 미리 수집해둡니다. (매우 중요)
-            const wrapperRect = wrapper.getBoundingClientRect();
-            const blurRects = [];
-            wrapper.querySelectorAll('.blur-effect').forEach(el => {
-                const rects = el.getClientRects(); // 줄바꿈된 텍스트의 각 줄마다 영역 수집
-                for (let i = 0; i < rects.length; i++) {
-                    blurRects.push({
-                        x: rects[i].left - wrapperRect.left,
-                        y: rects[i].top - wrapperRect.top,
-                        w: rects[i].width,
-                        h: rects[i].height
-                    });
-                }
-            });
-
             try {
-                // 브라우저 렌더링 합성을 기다리기 위해 약간의 여유를 줍니다.
-                await new Promise(r => setTimeout(r, 200));
+                // 브라우저 렌더링 합성을 확실히 기다리기 위해 여유 시간을 300ms로 늘렸습니다.
+                await new Promise(r => setTimeout(r, 300));
 
                 const fullCanvas = await html2canvas(wrapper, {
                     scale: 4, 
@@ -1491,45 +1490,15 @@
                     useCORS: true,
                     logging: false,
                     allowTaint: true,
-                    // letterRendering: true 옵션은 CSS를 망가뜨리므로 삭제했습니다.
+                    // [핵심 버그픽스] letterRendering: true 옵션은 텍스트의 CSS 효과를 증발시키므로 완전 삭제했습니다.
                     windowWidth: wrapper.scrollWidth,
                     windowHeight: wrapper.scrollHeight
                 });
 
-                const fullCtx = fullCanvas.getContext('2d');
-                const scale = 4;
-
-                // [핵심] html2canvas가 무시한 블러를 캔버스 레벨에서 강제로 다시 먹이는 작업
-                if (blurRects.length > 0) {
-                    const blurRadius = 16; // 4px * scale 4배
-                    blurRects.forEach(r => {
-                        const pad = 12; // 블러가 자연스럽게 번지도록 여유 공간 확보
-                        const sx = Math.max(0, (r.x - pad) * scale);
-                        const sy = Math.max(0, (r.y - pad) * scale);
-                        const sw = (r.w + pad * 2) * scale;
-                        const sh = (r.h + pad * 2) * scale;
-
-                        // 1. 해당 글씨 영역만 임시 캔버스로 정확히 복사
-                        const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = sw;
-                        tempCanvas.height = sh;
-                        const tempCtx = tempCanvas.getContext('2d');
-                        tempCtx.putImageData(fullCtx.getImageData(sx, sy, sw, sh), 0, 0);
-
-                        // 2. 원본 캔버스에서는 그 자리에 있던 "선명한 글씨"를 완전히 지워버림
-                        fullCtx.clearRect(sx, sy, sw, sh);
-
-                        // 3. 임시 캔버스의 글씨에 네이티브 블러를 먹이면서 다시 그 자리에 붙여넣음
-                        fullCtx.save();
-                        fullCtx.filter = `blur(${blurRadius}px)`;
-                        fullCtx.drawImage(tempCanvas, sx, sy);
-                        fullCtx.restore();
-                    });
-                }
-
                 // 캡처 후 배경 원복
                 wrapper.style.background = originalBg;
 
+                const fullCtx = fullCanvas.getContext('2d');
                 const ratioVal = document.getElementById('imageRatio').value;
                 const unscaledWidth = wrapper.offsetWidth;
                 const totalHeight = fullCanvas.height;
@@ -1546,7 +1515,6 @@
                     sliceCanvas.height = totalHeight;
                     const ctx = sliceCanvas.getContext('2d');
                     
-                    // 배경 채우기
                     if (bgMode === 'gradient') {
                         const dir = document.getElementById('gradDirection').value;
                         const gradPos = document.getElementById('gradPos').value;
@@ -1565,7 +1533,6 @@
                     }
                     ctx.fillRect(0, 0, width, totalHeight);
                     
-                    // 원본 콘텐츠 그리기
                     ctx.drawImage(fullCanvas, 0, 0);
                     
                     const imgUrl = sliceCanvas.toDataURL("image/png", 1.0);
@@ -1610,7 +1577,6 @@
                         if (currentY + sliceHeightToDraw >= totalHeight) {
                             sliceHeightToDraw = totalHeight - currentY;
                         } else {
-                            // 투명 바탕에서 알파 채널을 통해 빈 공간 확인
                             sliceHeightToDraw = findSafeCutY(fullCtx, width, currentY, sliceHeightToDraw, availableContentH * 0.5);
                         }
                         
@@ -1626,7 +1592,6 @@
                         sliceCanvas.height = ACTUAL_SLICE_HEIGHT;
                         const ctx = sliceCanvas.getContext('2d');
                         
-                        // 페이지마다 개별적인 그라데이션 적용
                         if (bgMode === 'gradient') {
                             const dir = document.getElementById('gradDirection').value;
                             const gradPos = document.getElementById('gradPos').value;
@@ -1645,7 +1610,6 @@
                         }
                         ctx.fillRect(0, 0, width, ACTUAL_SLICE_HEIGHT);
 
-                        // 투명으로 캡처된 원본 글씨 그리기
                         ctx.drawImage(
                             fullCanvas,
                             0, currentY, width, sliceHeightToDraw, 
@@ -1686,7 +1650,7 @@
                 console.error(err);
                 statusText.innerText = "오류가 발생했습니다. 새로고침 해주세요.";
             } finally {
-                wrapper.style.background = originalBg; // 혹시나 에러 났을 때 원복
+                wrapper.style.background = originalBg; 
                 if (autoTrim) wrapper.style.minHeight = originalMinHeight || '200px';
             }
         }
@@ -1697,7 +1661,6 @@
             const timestamp = new Date().getTime();
             const dlOrder = document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward';
             
-            // 이미지 배열에 순서 정보 추가
             let dlList = previewImages.map((url, idx) => ({ url, num: idx + 1 }));
             
             if (dlOrder === 'reverse') {
@@ -1717,7 +1680,6 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // 순서 꼬임을 방지하기 위한 강제 시간 지연
                 await new Promise(r => setTimeout(r, 600));
             }
             closePreview();
@@ -1833,7 +1795,6 @@
             if(gradPickr2) { isSyncingGrad2 = true; gradPickr2.setColor(gradColor2); isSyncingGrad2 = false; }
             document.getElementById('gradDirection').value = preset.gradDirection || 'to bottom';
 
-            // 그라데이션 프리셋 활성화 해제 및 기본값 갱신
             const gradSiblings = document.querySelectorAll('.color-swatch[data-type="grad"]');
             gradSiblings.forEach(btn => {
                 btn.classList.remove('active');
@@ -1880,3 +1841,4 @@
     </script>
 </body>
 </html>
+
