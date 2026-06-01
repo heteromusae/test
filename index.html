@@ -9,8 +9,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- modern-screenshot (html2canvas 대체) -->
-    <script src="https://unpkg.com/modern-screenshot"></script>
+    <!-- html2canvas (안정성을 위해 롤백) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <!-- Marked.js (마크다운 파싱용) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -1342,25 +1342,14 @@
                 return;
             }
             
-            // 현재 선택된 영역의 부모를 찾아 실제 적용된 글자색을 가져옵니다 (currentColor 버그 방지)
-            let targetColor = currentTextColor;
-            const parentNode = sel.getRangeAt(0).commonAncestorContainer;
-            const parentEl = parentNode.nodeType === 3 ? parentNode.parentNode : parentNode;
-            
-            if (parentEl && parentEl.nodeType === 1) {
-                const computedColor = window.getComputedStyle(parentEl).color;
-                if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && computedColor !== 'transparent') {
-                    targetColor = computedColor;
-                }
-            }
-
             const html = sel.getRangeAt(0).cloneContents();
             const div = document.createElement('div');
             div.appendChild(html);
 
-            // html2canvas가 em 단위를 무시하는 버그가 있으므로 반드시 px 단위를 사용 (5px로 강하게)
-            // 줄바꿈 유지를 위해 SVG 대신 HTML text-shadow를 사용하되 rgba로 투명도(0.01)를 줘서 렌더링 강제
-            const blurredHTML = `<span class="blur-effect" style="color: rgba(0, 0, 0, 0.01) !important; text-shadow: 0px 0px 5px ${targetColor} !important; user-select: none;">${div.innerHTML}</span>`;
+            // html2canvas의 text-shadow 버그를 우회하기 위해 투명글씨 꼼수를 버리고,
+            // 최신버전에서 공식 지원하는 filter: blur 속성을 직접 사용합니다.
+            // 브라우저 렌더링 트리에서 이 요소가 확실히 독립 레이어로 인식되도록 opacity: 0.99를 함께 부여합니다.
+            const blurredHTML = `<span class="blur-effect" style="filter: blur(4px); opacity: 0.99; user-select: none; display: inline-block;">${div.innerHTML}</span>`;
             
             document.execCommand('insertHTML', false, blurredHTML);
         }
@@ -1481,11 +1470,15 @@
             try {
                 await new Promise(r => setTimeout(r, 150));
 
-                const fullCanvas = await modernScreenshot.domToCanvas(wrapper, {
-                    scale: 4,
-                    backgroundColor: 'transparent',
-                    width: wrapper.scrollWidth,
-                    height: wrapper.scrollHeight
+                const fullCanvas = await html2canvas(wrapper, {
+                    scale: 4, 
+                    backgroundColor: null, // 투명으로 캡처
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: true,
+                    letterRendering: true,
+                    windowWidth: wrapper.scrollWidth,
+                    windowHeight: wrapper.scrollHeight
                 });
 
                 // 캡처 후 배경 원복
@@ -1842,5 +1835,4 @@
     </script>
 </body>
 </html>
-
 
