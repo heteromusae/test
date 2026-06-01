@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -51,6 +50,48 @@
             font-display: swap;
         }
         @font-face { font-family: 'OngleIpSeaBreeze'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2510-1@1.0/Ownglyph_the_sea_breeze-Rg.woff2') format('woff2'); font-weight: normal; font-display: swap; }
+        @font-face {
+    font-family: 'ChosunIlboMyungjo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+        }
+        @font-face {
+    font-family: 'SchoolSafeStoneWall';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimDoldamM.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+        }
+        @font-face {
+    font-family: 'Yeongwol';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2507-2@1.0/YeongwolTTF-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+        }
+        @font-face {
+    font-family: 'Yangjin';
+    src: url('https://cdn.jsdelivr.net/gh/supernovice-lab/font@0.9/yangjin.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+        }
+        @font-face {
+    font-family: 'BookkMyungjo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+        }
+        @font-face {
+    font-family: 'Cafe24SuperMagic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/Cafe24Supermagic-Regular-v1.0.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+        }
+        @font-face {
+    font-family: 'GyeonggiMillenniumBackground';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-3@1.0/Batang_Regular.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
+        }
 
         /* 스크롤바 */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -118,17 +159,6 @@
             min-height: 200px;
             margin: 0 auto;
         }
-
-        /* 텍스트 섀도우를 이용한 블러 처리 */
-        .blur-text {
-            color: transparent;
-            text-shadow:
-                0 0 3px currentColor,
-                0 0 6px currentColor,
-                0 0 9px currentColor,
-                0 0 12px currentColor;
-            user-select: none;
-        }
     </style>
 </head>
 <body class="bg-gray-100 h-[100dvh] w-screen flex flex-col md:flex-row overflow-hidden font-noto-sans text-gray-800">
@@ -149,9 +179,9 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900 mb-1">⚙️ 텍스트 자동 변환</h3>
-                    <p><b>일괄 변환:</b> 별표로 감싸지지 일반 텍스트 문단에 지정한 따옴표를 입히고, 지문에 붙은 별표를 모두 삭제합니다.<br>
+                    <p><b>일괄 변환:</b> 별표로 감싸지지 않은 일반 텍스트 문단에 지정한 따옴표를 입히고, 지문에 붙은 별표를 모두 삭제합니다.<br>
                     <b>웹 서식 정리:</b> 외부에서 복사한 HTML 코드를 정리하여 불필요한 태그와 스타일은 지우고 텍스트만 깔끔하게 보존합니다.<br>
-                    <b>🔍 치환 기능:</b> 상단 툴바의 버튼을 통해 문서 내 특정 텍스트를 다른 텍스트로 일괄 치환합니다.</p>
+                    <b>치환 기능:</b> 상단 툴바의 버튼을 통해 문서 내 특정 텍스트를 다른 텍스트로 일괄 치환합니다.</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-gray-900 mb-1">✨ 상단 툴바 기능</h3>
@@ -196,8 +226,7 @@
                     <input type="text" id="replaceWith" class="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-indigo-500" placeholder="예: 새 문구">
                 </div>
                 <div class="text-[10px] text-gray-500 bg-gray-50 p-2.5 rounded border border-gray-200">
-                    문서 내의 텍스트를 지정한 텍스트로 일괄 변경합니다.<br>
-                    (실행 후 화살표 버튼이나 Ctrl+Z로 되돌리기가 가능합니다.)
+                    문서 내의 텍스트를 지정한 텍스트로 일괄 변경합니다.
                 </div>
             </div>
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
@@ -231,6 +260,7 @@
     <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center z-20 flex-shrink-0 shadow-sm">
         <h1 class="text-base font-bold flex items-center gap-2 text-indigo-700">
             📖 로그 발췌 툴
+            <span class="text-[11px] font-normal text-gray-400 tracking-wide">by @heteromusae</span>
         </h1>
         <div class="flex items-center gap-2">
             <button onclick="openHelp()" class="text-gray-500 hover:text-gray-800 p-1 flex-shrink-0" title="도움말">
@@ -290,20 +320,27 @@
                         <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">시스템 기본 폰트</option>
                         <optgroup label="명조체">
                             <option value="'Noto Serif KR', serif" selected>Noto Serif KR</option>
-                            <option value="'Nanum Myeongjo', serif">Nanum Myeongjo</option>
-                            <option value="'Gowun Batang', serif">Gowun Batang</option>
+                            <option value="'Nanum Myeongjo', serif">나눔명조</option>
+                            <option value="'Gowun Batang', serif">고운바탕</option>
+                            <option value="'BookkMyungjo', serif">부크크 명조</option>
+                            <option value="'ChosunIlboMyungjo', serif">조선일보명조체</option>
+                            <option value="'GyeonggiMillenniumBackground', serif">경기천년바탕</option>
                         </optgroup>
                         <optgroup label="고딕체">
                             <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
-                            <option value="'Gowun Dodum', sans-serif">Gowun Dodum</option>
-                            <option value="'Paperozi', sans-serif">Paperozi</option>
-                            <option value="'Pretendard', sans-serif">Pretendard</option>
+                            <option value="'Gowun Dodum', sans-serif">고운돋움</option>
+                            <option value="'Paperozi', sans-serif">페이퍼로지</option>
+                            <option value="'Pretendard', sans-serif">프리텐다드</option>
+                            <option value="'Cafe24SuperMagic', serif">카페24 슈퍼매직</option>
+                            <option value="'Yangjin', sans-serif">양진체</option>
                         </optgroup>
                         <optgroup label="손글씨/특수">
                             <option value="'OngleipParkDahyeon', sans-serif">온글잎 박다현</option>
                             <option value="'OngleIpSeaBreeze', sans-serif">온글잎 바닷바람</option>
                             <option value="'SchoolSafetyKidariBalloon', sans-serif">학교안심 키다리풍선</option>
                             <option value="'NeoDonggeunmo', sans-serif">네오둥근모</option>
+                            <option value="'SchoolSafeStoneWall', sans-serif">학교안심 돌담</option>
+                            <option value="'Yeongwol', sans-serif">영월체</option>
                         </optgroup>
                     </select>
                 </div>
@@ -312,6 +349,9 @@
                     <div>
                         <label class="block text-xs font-medium mb-1 text-gray-700">글씨 크기</label>
                         <select id="globalFontSize" class="w-full border border-gray-300 rounded p-1.5 text-sm outline-none focus:border-indigo-500 bg-gray-50" onchange="updateGlobalStyles()">
+                            <option value="5px">5px</option>
+                            <option value="6px">6px</option>
+                            <option value="7px">7px</option>
                             <option value="8px">8px</option>
                             <option value="9px">9px</option>
                             <option value="10px" selected>10px (기본)</option>
@@ -436,26 +476,34 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mb-2">
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">시작 색상</label>
-                                <div class="flex items-center gap-1 grad-pickr">
-                                    <div id="gradPickr1"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">끝 색상</label>
-                                <div class="flex items-center gap-1 grad-pickr">
-                                    <div id="gradPickr2"></div>
-                                </div>
-                            </div>
-                        </div>
+    <div>
+        <label class="block text-[10px] text-gray-500 mb-1">시작 색상</label>
+        <div class="flex items-center gap-1 grad-pickr">
+            <div id="gradPickr1"></div>
+        </div>
+    </div>
+    <div>
+        <div class="flex justify-between items-center mb-1">
+            <label class="block text-[10px] text-gray-500">끝 색상</label>
+            <button onclick="generateAutoAnalogousColor()" class="text-[9px] text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-1.5 py-0.5 rounded transition shadow-sm">연한 유사색 자동</button>
+        </div>
+        <div class="flex items-center gap-1 grad-pickr">
+            <div id="gradPickr2"></div>
+        </div>
+    </div>
+</div>
+
                         <div class="mb-3">
                             <label class="block text-[10px] text-gray-500 mb-1">방향</label>
                             <select id="gradDirection" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="updateGlobalStyles()">
+                                <option value="to top">↑</option>
                                 <option value="to bottom" selected>↓</option>
+                                <option value="to left">←</option>
                                 <option value="to right">→</option>
-                                <option value="to bottom right">↘</option>
+                                <option value="to top left">↖</option>
                                 <option value="to top right">↗</option>
+                                <option value="to bottom left">↙</option>
+                                <option value="to bottom right">↘</option>
                             </select>
                         </div>
                         <div>
@@ -551,19 +599,22 @@
                 <div>
                     <label class="block text-xs font-medium mb-1 text-gray-700">최종 캡처 비율 (자르기)</label>
                     <select id="imageRatio" class="w-full border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50">
-                        <optgroup label="세로형 (단행본/모바일)">
-                            <option value="1.5" selected>1 : 1.5 (소설책 단행본 - 추천)</option>
-                            <option value="1.414">1 : 1.414 (A4 용지)</option>
-                            <option value="1.25">4 : 5 (인스타 세로)</option>
-                            <option value="2.0">1 : 2 (웹소설 뷰어)</option>
+                        <optgroup label="세로형">
+                            <option value="1.5" selected>1 : 1.5 (추천)</option>
+                            <option value="1.414">1 : 1.414</option>
+                            <option value="1.25">4 : 5</option>
+                            <option value="2.0">1 : 2</option>
                         </optgroup>
-                        <optgroup label="가로형 (PC/배경화면)">
-                            <option value="0.5625">16 : 9 (와이드 가로형)</option>
-                            <option value="0.75">4 : 3 (표준 가로형)</option>
-                            <option value="0.428">21 : 9 (영화 비율 가로형)</option>
+                        <optgroup label="가로형">
+                            <option value="0.8">5 : 4</option>
+                            <option value="0.75">4 : 3</option>
+                            <option value="0.6667">3 : 2</option>
+                            <option value="0.625">16 : 10</option>
+                            <option value="0.5625">16 : 9</option>
+                            
                         </optgroup>
                         <optgroup label="기타">
-                            <option value="1.0">1 : 1 (정방형)</option>
+                            <option value="1.0">1 : 1</option>
                             <option value="auto">비율 무시 (자르지 않고 통째로 1장 캡처)</option>
                         </optgroup>
                     </select>
@@ -630,11 +681,6 @@
             <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('underline')" title="밑줄"><u class="text-base font-serif">U</u></button>
             <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('strikeThrough')" title="취소선"><s class="text-base font-serif">S</s></button>
             
-            <!-- 블러 버튼 (text-shadow 활용) -->
-            <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="applyBlurText()" title="흐리게 블러 처리">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-            </button>
-
             <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
 
             <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="execCmd('justifyLeft')" title="왼쪽 정렬"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg></button>
@@ -1308,29 +1354,6 @@
 
             document.execCommand('insertHTML', false, html);
         }
-        
-        // text-shadow를 활용한 블러 적용 기능
-        function applyBlurText() {
-            if (savedSelectionRange) {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(savedSelectionRange);
-            }
-
-            const sel = window.getSelection();
-            if (!sel.rangeCount || sel.isCollapsed) {
-                alert("블러 처리할 텍스트를 드래그하여 선택해주세요.");
-                return;
-            }
-
-            const html = sel.getRangeAt(0).cloneContents();
-            const div = document.createElement('div');
-            div.appendChild(html);
-
-            const blurHTML = `<span class="blur-text">${div.innerHTML}</span>`;
-            
-            document.execCommand('insertHTML', false, blurHTML);
-        }
 
         function execCmd(command, value = null) {
             if (savedSelectionRange && command !== 'undo' && command !== 'redo') {
@@ -1367,24 +1390,9 @@
                 return;
             }
 
-            // 1. 기본 브라우저 서식 해제
+            // 기본 브라우저 서식 해제
             document.execCommand('removeFormat', false, null);
             document.execCommand('backColor', false, 'transparent');
-            
-            // 2. 선택된 범위 내의 블러 텍스트 해제
-            const range = sel.getRangeAt(0);
-            const editor = document.getElementById('editor');
-            const blurs = editor.querySelectorAll('.blur-text');
-            
-            blurs.forEach(el => {
-                if (sel.containsNode(el, true)) {
-                    const parent = el.parentNode;
-                    while(el.firstChild) {
-                        parent.insertBefore(el.firstChild, el);
-                    }
-                    parent.removeChild(el);
-                }
-            });
             
             document.getElementById('editor').focus();
         }
@@ -1418,7 +1426,71 @@
             }
             return targetHeight; 
         }
-        
+                /* --- 그라데이션 자동 연한 유사색 생성 로직 --- */
+        function hexToHSL(H) {
+            let r = 0, g = 0, b = 0;
+            if (H.length === 4) {
+                r = "0x" + H[1] + H[1]; g = "0x" + H[2] + H[2]; b = "0x" + H[3] + H[3];
+            } else if (H.length === 7) {
+                r = "0x" + H[1] + H[2]; g = "0x" + H[3] + H[4]; b = "0x" + H[5] + H[6];
+            }
+            r /= 255; g /= 255; b /= 255;
+            let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin, h = 0, s = 0, l = 0;
+            if (delta === 0) h = 0;
+            else if (cmax === r) h = ((g - b) / delta) % 6;
+            else if (cmax === g) h = (b - r) / delta + 2;
+            else h = (r - g) / delta + 4;
+            h = Math.round(h * 60);
+            if (h < 0) h += 360;
+            l = (cmax + cmin) / 2;
+            s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            s = +(s * 100).toFixed(1);
+            l = +(l * 100).toFixed(1);
+            return {h, s, l};
+        }
+
+        function HSLToHex(h, s, l) {
+            s /= 100; l /= 100;
+            let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+            else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+            else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+            else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+            else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+            else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            r = Math.round((r + m) * 255).toString(16).padStart(2, '0');
+            g = Math.round((g + m) * 255).toString(16).padStart(2, '0');
+            b = Math.round((b + m) * 255).toString(16).padStart(2, '0');
+            return "#" + r + g + b;
+        }
+
+        function generateAutoAnalogousColor() {
+            let hsl = hexToHSL(gradColor1);
+            
+            // 색상(Hue)을 약간 이동하여 유사색을 만듦 (25도)
+            let newH = (hsl.h + 25) % 360;
+            
+            // 밝기(Lightness)를 올려 연하게 만듦 (최소 88% 이상)
+            let newL = Math.min(97, hsl.l + 25);
+            if(newL < 88) newL = 88;
+            
+            // 채도(Saturation)는 파스텔톤을 위해 살짝 조정
+            let newS = Math.max(15, hsl.s - 5);
+            
+            let newHex = HSLToHex(newH, newS, newL);
+            
+            gradColor2 = newHex;
+            
+            // Pickr UI 및 화면 배경 업데이트 적용
+            if(gradPickr2) {
+                isSyncingGrad2 = true;
+                gradPickr2.setColor(newHex);
+                isSyncingGrad2 = false;
+            }
+            updateGlobalStyles();
+        }
+        /* ---------------------------------------------------- */
+
         function mixHexColors(c1, c2, percent) {
             const parse = c => {
                 let hex = c.replace('#', '');
@@ -1503,9 +1575,14 @@
                         const dir = document.getElementById('gradDirection').value;
                         const gradPos = document.getElementById('gradPos').value;
                         let grad;
-                        if (dir === 'to right') grad = ctx.createLinearGradient(0, 0, width, 0);
-                        else if (dir === 'to bottom right') grad = ctx.createLinearGradient(0, 0, width, totalHeight);
+                        if (dir === 'to top') grad = ctx.createLinearGradient(0, totalHeight, 0, 0);
+                        else if (dir === 'to bottom') grad = ctx.createLinearGradient(0, 0, 0, totalHeight);
+                        else if (dir === 'to left') grad = ctx.createLinearGradient(width, 0, 0, 0);
+                        else if (dir === 'to right') grad = ctx.createLinearGradient(0, 0, width, 0);
+                        else if (dir === 'to top left') grad = ctx.createLinearGradient(width, totalHeight, 0, 0);
                         else if (dir === 'to top right') grad = ctx.createLinearGradient(0, totalHeight, width, 0);
+                        else if (dir === 'to bottom left') grad = ctx.createLinearGradient(width, 0, 0, totalHeight);
+                        else if (dir === 'to bottom right') grad = ctx.createLinearGradient(0, 0, width, totalHeight);
                         else grad = ctx.createLinearGradient(0, 0, 0, totalHeight); 
                         
                         grad.addColorStop(0, gradColor1);
@@ -1580,9 +1657,14 @@
                             const dir = document.getElementById('gradDirection').value;
                             const gradPos = document.getElementById('gradPos').value;
                             let grad;
-                            if (dir === 'to right') grad = ctx.createLinearGradient(0, 0, width, 0);
-                            else if (dir === 'to bottom right') grad = ctx.createLinearGradient(0, 0, width, ACTUAL_SLICE_HEIGHT);
+                            if (dir === 'to top') grad = ctx.createLinearGradient(0, ACTUAL_SLICE_HEIGHT, 0, 0);
+                            else if (dir === 'to bottom') grad = ctx.createLinearGradient(0, 0, 0, ACTUAL_SLICE_HEIGHT);
+                            else if (dir === 'to left') grad = ctx.createLinearGradient(width, 0, 0, 0);
+                            else if (dir === 'to right') grad = ctx.createLinearGradient(0, 0, width, 0);
+                            else if (dir === 'to top left') grad = ctx.createLinearGradient(width, ACTUAL_SLICE_HEIGHT, 0, 0);
                             else if (dir === 'to top right') grad = ctx.createLinearGradient(0, ACTUAL_SLICE_HEIGHT, width, 0);
+                            else if (dir === 'to bottom left') grad = ctx.createLinearGradient(width, 0, 0, ACTUAL_SLICE_HEIGHT);
+                            else if (dir === 'to bottom right') grad = ctx.createLinearGradient(0, 0, width, ACTUAL_SLICE_HEIGHT);
                             else grad = ctx.createLinearGradient(0, 0, 0, ACTUAL_SLICE_HEIGHT); 
                             
                             grad.addColorStop(0, gradColor1);
@@ -1627,7 +1709,7 @@
                     });
                 }
                 
-                statusText.innerText = "이미지 생성이 완료되었습니다.";
+                statusText.innerText = "이미 생성이 완료되었습니다.";
                 downloadBtn.classList.remove('hidden');
                 
             } catch (err) {
