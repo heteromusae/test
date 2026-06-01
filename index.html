@@ -1465,17 +1465,19 @@
         }
 
                             
- function generateAutoAnalogousColor() {
+         function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
-            // 색상(Hue)을 약간 이동하여 유사색을 만듦 (25도)
-            let newH = (hsl.h + 25) % 360;
+            // 색상(Hue)을 0도 ~ 25도 사이에서 랜덤하게 이동
+            let hueShift = Math.floor(Math.random() * 26); // 0 ~ 25 랜덤
+            let newH = (hsl.h + hueShift) % 360;
             
-            // 밝기(Lightness)를 올려 연하게 만듦 (최소 30% 이상)
-            let newL = Math.min(97, hsl.l + 25);
+            // 밝기(Lightness)를 10% ~ 25% 사이에서 랜덤하게 증가
+            let lightnessBoost = Math.floor(Math.random() * 16) + 10; // 10 ~ 25 랜덤
+            let newL = Math.min(97, hsl.l + lightnessBoost);
             if(newL < 30) newL = 30;
             
-            // 채도(Saturation)는 파스텔톤을 위해 살짝 조정
+            // 채도(Saturation)는 똑같이 -5
             let newS = Math.max(15, hsl.s - 5);
             
             let newHex = HSLToHex(newH, newS, newL);
@@ -1490,6 +1492,7 @@
             }
             updateGlobalStyles();
         }
+
 
         /* ---------------------------------------------------- */
 
