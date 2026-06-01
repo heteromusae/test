@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -1346,10 +1346,9 @@
             const div = document.createElement('div');
             div.appendChild(html);
 
-            // html2canvas의 text-shadow 버그를 우회하기 위해 투명글씨 꼼수를 버리고,
-            // 최신버전에서 공식 지원하는 filter: blur 속성을 직접 사용합니다.
-            // 브라우저 렌더링 트리에서 이 요소가 확실히 독립 레이어로 인식되도록 opacity: 0.99를 함께 부여합니다.
-            const blurredHTML = `<span class="blur-effect" style="filter: blur(4px); opacity: 0.99; user-select: none; display: inline-block;">${div.innerHTML}</span>`;
+            // 투명 꼼수를 모두 제거하고 가장 깔끔한 기본 CSS 필터로 롤백. 
+            // 실제 이미지 캡처 시엔 캔버스 API로 100% 무조건 블러가 적용되도록 후처리 로직을 추가했습니다.
+            const blurredHTML = `<span class="blur-effect" style="filter: blur(4px); opacity: 0.85; user-select: none;">${div.innerHTML}</span>`;
             
             document.execCommand('insertHTML', false, blurredHTML);
         }
@@ -1467,8 +1466,24 @@
             // 그라데이션 및 정확한 자르기를 위해 배경을 일시적으로 투명하게 만듦
             wrapper.style.background = 'transparent';
 
+            // 캡처 직전, 블러 영역의 좌표를 문서 크기 대비 미리 수집해둡니다. (매우 중요)
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const blurRects = [];
+            wrapper.querySelectorAll('.blur-effect').forEach(el => {
+                const rects = el.getClientRects(); // 줄바꿈된 텍스트의 각 줄마다 영역 수집
+                for (let i = 0; i < rects.length; i++) {
+                    blurRects.push({
+                        x: rects[i].left - wrapperRect.left,
+                        y: rects[i].top - wrapperRect.top,
+                        w: rects[i].width,
+                        h: rects[i].height
+                    });
+                }
+            });
+
             try {
-                await new Promise(r => setTimeout(r, 150));
+                // 브라우저 렌더링 합성을 기다리기 위해 약간의 여유를 줍니다.
+                await new Promise(r => setTimeout(r, 200));
 
                 const fullCanvas = await html2canvas(wrapper, {
                     scale: 4, 
@@ -1476,15 +1491,45 @@
                     useCORS: true,
                     logging: false,
                     allowTaint: true,
-                    letterRendering: true,
+                    // letterRendering: true 옵션은 CSS를 망가뜨리므로 삭제했습니다.
                     windowWidth: wrapper.scrollWidth,
                     windowHeight: wrapper.scrollHeight
                 });
 
+                const fullCtx = fullCanvas.getContext('2d');
+                const scale = 4;
+
+                // [핵심] html2canvas가 무시한 블러를 캔버스 레벨에서 강제로 다시 먹이는 작업
+                if (blurRects.length > 0) {
+                    const blurRadius = 16; // 4px * scale 4배
+                    blurRects.forEach(r => {
+                        const pad = 12; // 블러가 자연스럽게 번지도록 여유 공간 확보
+                        const sx = Math.max(0, (r.x - pad) * scale);
+                        const sy = Math.max(0, (r.y - pad) * scale);
+                        const sw = (r.w + pad * 2) * scale;
+                        const sh = (r.h + pad * 2) * scale;
+
+                        // 1. 해당 글씨 영역만 임시 캔버스로 정확히 복사
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = sw;
+                        tempCanvas.height = sh;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.putImageData(fullCtx.getImageData(sx, sy, sw, sh), 0, 0);
+
+                        // 2. 원본 캔버스에서는 그 자리에 있던 "선명한 글씨"를 완전히 지워버림
+                        fullCtx.clearRect(sx, sy, sw, sh);
+
+                        // 3. 임시 캔버스의 글씨에 네이티브 블러를 먹이면서 다시 그 자리에 붙여넣음
+                        fullCtx.save();
+                        fullCtx.filter = `blur(${blurRadius}px)`;
+                        fullCtx.drawImage(tempCanvas, sx, sy);
+                        fullCtx.restore();
+                    });
+                }
+
                 // 캡처 후 배경 원복
                 wrapper.style.background = originalBg;
 
-                const fullCtx = fullCanvas.getContext('2d');
                 const ratioVal = document.getElementById('imageRatio').value;
                 const unscaledWidth = wrapper.offsetWidth;
                 const totalHeight = fullCanvas.height;
@@ -1835,4 +1880,3 @@
     </script>
 </body>
 </html>
-
