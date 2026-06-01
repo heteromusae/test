@@ -1464,21 +1464,21 @@
             return "#" + r + g + b;
         }
 
-                            
-         function generateAutoAnalogousColor() {
+                 function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
             // 색상(Hue)을 0도 ~ 25도 사이에서 랜덤하게 이동
             let hueShift = Math.floor(Math.random() * 26); // 0 ~ 25 랜덤
             let newH = (hsl.h + hueShift) % 360;
             
-            // 밝기(Lightness)를 10% ~ 25% 사이에서 랜덤하게 증가
-            let lightnessBoost = Math.floor(Math.random() * 16) + 10; // 10 ~ 25 랜덤
+            // 밝기(Lightness)를 15% ~ 30% 사이에서 랜덤하게 증가
+            let lightnessBoost = Math.floor(Math.random() * 16) + 15; // 15 ~ 30 랜덤
             let newL = Math.min(97, hsl.l + lightnessBoost);
             if(newL < 30) newL = 30;
             
-            // 채도(Saturation)는 똑같이 -5
-            let newS = Math.max(15, hsl.s - 5);
+            // 채도(Saturation)를 0 ~ 5 사이에서 랜덤하게 감소 (-5 ~ 0)
+            let satDrop = Math.floor(Math.random() * 6); // 0 ~ 5 랜덤
+            let newS = Math.max(15, hsl.s - satDrop);
             
             let newHex = HSLToHex(newH, newS, newL);
             
@@ -1492,7 +1492,6 @@
             }
             updateGlobalStyles();
         }
-
 
         /* ---------------------------------------------------- */
 
