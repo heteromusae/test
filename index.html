@@ -1465,23 +1465,18 @@
         }
 
                                         function generateAutoAnalogousColor() {
+ function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
             // 색상(Hue)을 약간 이동하여 유사색을 만듦 (25도)
             let newH = (hsl.h + 25) % 360;
             
-            // [비례 계산] 어두울수록 1에 가까워지는 비율값 (0 ~ 1)
-            let darknessRatio = (100 - hsl.l) / 100;
+            // 밝기(Lightness)를 올려 연하게 만듦 (최소 60% 이상)
+            let newL = Math.min(97, hsl.l + 20);
+            if(newL < 60) newL = 60;
             
-            // 명도(Lightness) 상승: 기본 +10을 깔고, 어두울수록 최대 +15까지 추가로 더함 (총 상승폭 10 ~ 25)
-            let lBoost = 10 + (darknessRatio * 15);
-            let newL = hsl.l + lBoost;
-            if (newL > 97) newL = 97;
-            
-            // 채도(Saturation) 감소: 기본 -5를 깔고, 어두울수록 최대 -10까지만 추가로 깎음 (총 감소폭 5 ~ 15)
-            let sDrop = 5 + (darknessRatio * 10);
-            let newS = hsl.s - sDrop;
-            if (newS < 15) newS = 15;
+            // 채도(Saturation)는 파스텔톤을 위해 살짝 조정
+            let newS = Math.max(15, hsl.s - 5);
             
             let newHex = HSLToHex(newH, newS, newL);
             
@@ -1495,7 +1490,6 @@
             }
             updateGlobalStyles();
         }
-
 
         /* ---------------------------------------------------- */
 
