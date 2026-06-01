@@ -1471,9 +1471,9 @@
             // 색상(Hue)을 약간 이동하여 유사색을 만듦 (25도)
             let newH = (hsl.h + 25) % 360;
             
-            // 밝기(Lightness)를 올려 연하게 만듦 (최소 60% 이상)
-            let newL = Math.min(97, hsl.l + 20);
-            if(newL < 60) newL = 60;
+            // 밝기(Lightness)를 올려 연하게 만듦 (최소 30% 이상)
+            let newL = Math.min(97, hsl.l + 25);
+            if(newL < 30) newL = 30;
             
             // 채도(Saturation)는 파스텔톤을 위해 살짝 조정
             let newS = Math.max(15, hsl.s - 5);
