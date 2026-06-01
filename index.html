@@ -485,7 +485,7 @@
     <div>
         <div class="flex justify-between items-center mb-1">
             <label class="block text-[10px] text-gray-500">끝 색상</label>
-            <button onclick="generateAutoAnalogousColor()" class="text-[9px] text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-1.5 py-0.5 rounded transition shadow-sm">연한 유사색 자동</button>
+            <button onclick="generateAutoAnalogousColor()" class="text-[9px] text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-1.5 py-0.5 rounded transition shadow-sm">자동 그라데이션</button>
         </div>
         <div class="flex items-center gap-1 grad-pickr">
             <div id="gradPickr2"></div>
@@ -1464,15 +1464,14 @@
             return "#" + r + g + b;
         }
 
-        function generateAutoAnalogousColor() {
+                function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
             // 색상(Hue)을 약간 이동하여 유사색을 만듦 (25도)
             let newH = (hsl.h + 25) % 360;
             
-            // 밝기(Lightness)를 올려 연하게 만듦 (최소 88% 이상)
-            let newL = Math.min(97, hsl.l + 25);
-            if(newL < 88) newL = 88;
+            // 밝기(Lightness) 증가폭을 +10으로 줄이고 강제 하한선(88) 제거
+            let newL = Math.min(97, hsl.l + 30);
             
             // 채도(Saturation)는 파스텔톤을 위해 살짝 조정
             let newS = Math.max(15, hsl.s - 5);
@@ -1489,6 +1488,7 @@
             }
             updateGlobalStyles();
         }
+
         /* ---------------------------------------------------- */
 
         function mixHexColors(c1, c2, percent) {
