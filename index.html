@@ -1464,7 +1464,7 @@
             return "#" + r + g + b;
         }
 
-                                function generateAutoAnalogousColor() {
+                                        function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
             // 색상(Hue)을 약간 이동하여 유사색을 만듦 (25도)
@@ -1473,14 +1473,13 @@
             // [비례 계산] 어두울수록 1에 가까워지는 비율값 (0 ~ 1)
             let darknessRatio = (100 - hsl.l) / 100;
             
-            // 명도(Lightness) 상승: 기본 +10을 깔고, 어두울수록 최대 +15까지 추가로 더함 (총 최대 +25)
+            // 명도(Lightness) 상승: 기본 +10을 깔고, 어두울수록 최대 +15까지 추가로 더함 (총 상승폭 10 ~ 25)
             let lBoost = 10 + (darknessRatio * 15);
             let newL = hsl.l + lBoost;
             if (newL > 97) newL = 97;
             
-            // 채도(Saturation) 감소: 기본 -5를 깔고, 어두울수록 최대 -25까지 추가로 깎음 (총 최대 -30)
-            // 이렇게 하면 어두운 색일수록 채도가 팍 깎여서 쨍해지는(네온) 현상을 자연스럽게 막아줍니다.
-            let sDrop = 5 + (darknessRatio * 25);
+            // 채도(Saturation) 감소: 기본 -5를 깔고, 어두울수록 최대 -10까지만 추가로 깎음 (총 감소폭 5 ~ 15)
+            let sDrop = 5 + (darknessRatio * 10);
             let newS = hsl.s - sDrop;
             if (newS < 15) newS = 15;
             
@@ -1496,7 +1495,6 @@
             }
             updateGlobalStyles();
         }
-
 
 
         /* ---------------------------------------------------- */
