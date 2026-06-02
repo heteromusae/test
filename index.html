@@ -756,8 +756,12 @@
 
             <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
 
-            <button class="toolbar-btn px-2 w-auto text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 flex-shrink-0" onmousedown="event.preventDefault()" onclick="applyMarkdown()">
+                        <button class="toolbar-btn px-2 w-auto text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 flex-shrink-0" onmousedown="event.preventDefault()" onclick="applyMarkdown()">
                 M↓ 마크다운
+            </button>
+            
+            <button class="toolbar-btn px-2 w-auto text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 flex-shrink-0 ml-1" onmousedown="event.preventDefault()" onclick="applyHTML()">
+                &lt;/&gt; HTML 적용
             </button>
 
             <!-- 텍스트 치환 기능 -->
@@ -772,11 +776,12 @@
         </header>
 
         <!-- 스크롤 본문 -->
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start relative" id="scroll-area">
+                <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start relative" id="scroll-area">
             
             <div id="export-wrapper" class="w-full max-w-[500px] bg-white relative">
-                <!-- 종이 질감 오버레이 -->
                 <div id="texture-overlay" class="absolute inset-0 z-10 pointer-events-none opacity-0"></div>
+                
+                <div id="watermarkText" class="absolute bottom-4 right-8 z-30 text-gray-400 opacity-80 text-[10px] font-medium pointer-events-none empty:hidden"></div>
                 
                 <div id="editor" contenteditable="true" class="w-full outline-none font-noto-serif relative z-20" style="font-size: 10px; line-height: 1.8; letter-spacing: -0.5px; color: #111111; padding: 40px;" spellcheck="false">이곳에 발췌할 로그를 붙여넣으세요. </div>
             </div>
@@ -1223,8 +1228,11 @@
                 ratio: document.getElementById('imageRatio').value,
                 quoteStyle: document.getElementById('quoteStyle').value,
                 autoTrim: document.getElementById('autoTrim').checked,
-                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward'
-            };
+                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward',
+                watermarkText: document.getElementById('watermarkInput') ? document.getElementById('watermarkInput').value : '',
+                watermarkPos: document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right',
+                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'text-gray-400'
+ };
             localStorage.setItem('autoSavedSettings', JSON.stringify(settings));
         }
 
@@ -2035,6 +2043,14 @@
             applyCustomColor('text', preset.textColor || "#111111");
             
             toggleTexture();
+                        if(document.getElementById('watermarkInput')) {
+                document.getElementById('watermarkInput').value = preset.watermarkText || '';
+                document.getElementById('watermarkPos').value = preset.watermarkPos || 'right';
+                document.getElementById('watermarkColor').value = preset.watermarkColor || 'text-gray-400';
+                document.getElementById('watermarkText').innerText = preset.watermarkText || '';
+                updateWatermarkStyle();
+            }
+
             updateGlobalStyles();
         }
 
