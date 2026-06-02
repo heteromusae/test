@@ -1407,6 +1407,117 @@
 
             document.execCommand('insertHTML', false, html);
         }
+         /* --- HTML 렌더링 기능 --- */
+        function applyHTML() {
+            if (savedSelectionRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedSelectionRange);
+            }
+            const sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) {
+                alert("HTML로 렌더링할 태그(텍스트)를 드래그하여 선택해주세요.");
+                return;
+            }
+            let rawText = sel.toString();
+            if (!rawText.trim()) return;
+            document.execCommand('insertHTML', false, rawText);
+        }
+
+        /* --- 폰트 및 색상 태그 전용 제거 --- */
+        function removeFontAndColorTags() {
+            const editor = document.getElementById('editor');
+            
+            // 1. <font> 태그 자체를 벗기기
+            const fonts = editor.querySelectorAll('font');
+            fonts.forEach(f => {
+                const frag = document.createDocumentFragment();
+                while(f.firstChild) frag.appendChild(f.firstChild);
+                f.parentNode.replaceChild(frag, f);
+            });
+
+            // 2. 인라인 style 에서 color, font, background 속성 지우기
+            const styledElements = editor.querySelectorAll('[style]');
+            styledElements.forEach(el => {
+                el.style.color = '';
+                el.style.backgroundColor = '';
+                el.style.fontFamily = '';
+                el.style.fontSize = '';
+                // 남은 스타일이 없으면 style 속성 자체 제거
+                if (!el.getAttribute('style').trim()) {
+                    el.removeAttribute('style');
+                }
+                // span인데 아무 속성도 없으면 태그 벗기기
+                if (el.tagName === 'SPAN' && !el.hasAttributes()) {
+                    const frag = document.createDocumentFragment();
+                    while(el.firstChild) frag.appendChild(el.firstChild);
+                    el.parentNode.replaceChild(frag, el);
+                }
+            });
+            // 저장 트리거
+            editor.focus();
+            editor.blur();
+        }
+
+        /* --- 별/따옴표 세분화 제어 --- */
+        function modifyTextSpecific(action) {
+            const editor = document.getElementById('editor');
+            let rawText = editor.innerText;
+            if (!rawText.trim()) return;
+
+            let lines = rawText.split('\n');
+            let newLines = lines.map(line => {
+                let text = line.trim();
+                if (!text) return line; // 원본 유지(빈줄)
+
+                switch(action) {
+                    case 'addStar':
+                        if(!text.startsWith('*')) text = '*' + text;
+                        if(!text.endsWith('*')) text = text + '*';
+                        return text;
+                    case 'removeStar':
+                        return text.replace(/\*/g, '');
+                    case 'addQuote':
+                        // 별로 감싸져있지 않은 문단에만 쌍따옴표 추가
+                        if (!(text.startsWith('*') && text.endsWith('*'))) {
+                            if (!/^["“”'‘’]/.test(text)) text = '“' + text;
+                            if (!/["“”'‘’]$/.test(text)) text = text + '”';
+                        }
+                        return text;
+                    case 'removeQuote':
+                        return text.replace(/^["“”'‘’]+|["“”'‘’]+$/g, '');
+                    case 'convertQuote':
+                        const type = document.getElementById('quoteConvertType').value;
+                        if(type === 'toSmartDouble') return text.replace(/"(.*?)"/g, '“$1”');
+                        if(type === 'toStraightDouble') return text.replace(/[“”]/g, '"');
+                        if(type === 'toSmartSingle') return text.replace(/'(.*?)'/g, '‘$1’');
+                        if(type === 'toStraightSingle') return text.replace(/[‘’]/g, "'");
+                        return text;
+                    default:
+                        return text;
+                }
+            });
+
+            const finalString = newLines.join('\n');
+            editor.focus();
+            document.execCommand('selectAll', false, null);
+            document.execCommand('insertText', false, finalString);
+        }
+
+        /* --- 워터마크 스타일/위치 업데이트 --- */
+        function updateWatermarkStyle() {
+            const wm = document.getElementById('watermarkText');
+            if(!wm) return;
+            const pos = document.getElementById('watermarkPos').value;
+            const color = document.getElementById('watermarkColor').value;
+            
+            // 클래스 초기화 후 재할당
+            wm.className = `absolute bottom-4 z-30 opacity-80 text-[10px] font-medium pointer-events-none empty:hidden ${color}`;
+            if(pos === 'right') wm.classList.add('right-8');
+            else wm.classList.add('left-8');
+            
+            saveAutoSettings();
+        }
 
         function execCmd(command, value = null) {
             if (savedSelectionRange && command !== 'undo' && command !== 'redo') {
