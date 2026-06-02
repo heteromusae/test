@@ -548,24 +548,77 @@
             <hr class="border-gray-100">
 
             <!-- 대사 자동 변환 기능 -->
-            <div class="space-y-4">
-                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">텍스트 변환</h3>
-                
+                        <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">하단 서명</h3>
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-gray-700">대사 자동 변환</label>
-                    <div class="flex gap-2">
-                        <select id="quoteStyle" class="flex-1 border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50">
-                            <option value="smart">“ ” (둥근 따옴표)</option>
-                            <option value="straight">" " (직선 따옴표)</option>
-                        </select>
-                        <button onclick="formatDialogue()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 font-bold py-1.5 px-3 rounded text-xs transition flex-shrink-0">
-                            일괄 변환
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-gray-500 mt-1.5 leading-tight">
-                        별표로 감싸지지 않은 문단에 따옴표를 씌우고, 글 전체의 별표를 삭제합니다. (기존 서식은 초기화됩니다)
-                    </p>
+                    <label class="block text-[10px] text-gray-500 mb-1">작가 / 캐릭터 이름 (비워두면 숨김)</label>
+                    <input type="text" id="watermarkInput" class="w-full border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50" placeholder="예: @heteromusae" oninput="document.getElementById('watermarkText').innerText = this.value; saveAutoSettings();">
                 </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">위치</label>
+                        <select id="watermarkPos" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="updateWatermarkStyle()">
+                            <option value="right" selected>오른쪽 아래</option>
+                            <option value="left">왼쪽 아래</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">색상</label>
+                        <select id="watermarkColor" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="updateWatermarkStyle()">
+                            <option value="text-gray-400" selected>회색 (기본)</option>
+                            <option value="text-gray-700">진한 회색</option>
+                            <option value="text-black">검은색</option>
+                            <option value="text-white">흰색</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">텍스트 / 태그 변환</h3>
+                
+                <div class="bg-gray-50 p-2.5 rounded border border-gray-200 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">별(*) 기호</label>
+                        <div class="flex gap-2">
+                            <button onclick="modifyTextSpecific('addStar')" class="flex-1 bg-white hover:bg-gray-100 border border-gray-300 text-xs py-1 rounded transition shadow-sm">전체 추가</button>
+                            <button onclick="modifyTextSpecific('removeStar')" class="flex-1 bg-white hover:bg-gray-100 border border-gray-300 text-xs py-1 rounded transition shadow-sm text-red-600">모두 제거</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">따옴표 (" ")</label>
+                        <div class="flex gap-2 mb-1.5">
+                            <button onclick="modifyTextSpecific('addQuote')" class="flex-1 bg-white hover:bg-gray-100 border border-gray-300 text-xs py-1 rounded transition shadow-sm">전체 추가</button>
+                            <button onclick="modifyTextSpecific('removeQuote')" class="flex-1 bg-white hover:bg-gray-100 border border-gray-300 text-xs py-1 rounded transition shadow-sm text-red-600">모두 제거</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="quoteConvertType" class="flex-1 border border-gray-300 rounded p-1 text-[10px] outline-none">
+                                <option value="toSmartDouble">" " ➔ “ ” (둥근 쌍)</option>
+                                <option value="toStraightDouble">“ ” ➔ " " (직선 쌍)</option>
+                                <option value="toSmartSingle">' ' ➔ ‘ ’ (둥근 홑)</option>
+                                <option value="toStraightSingle">‘ ’ ➔ ' ' (직선 홑)</option>
+                            </select>
+                            <button onclick="modifyTextSpecific('convertQuote')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 text-xs px-2 rounded transition shadow-sm whitespace-nowrap">변환</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-2.5 rounded border border-gray-200 space-y-2.5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">폰트 / 색상 태그만 지우기</label>
+                        <p class="text-[10px] text-gray-500 mb-1.5 leading-tight">글의 내용이나 줄바꿈은 그대로 살리고 &lt;font&gt;, color 등 스타일 태그만 찾아 지웁니다.</p>
+                        <button onclick="removeFontAndColorTags()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">태그 지우기</button>
+                    </div>
+                    <hr class="border-gray-200">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">위아래 여백(빈 줄) 제거</label>
+                        <button onclick="trimEmptyLines()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">위아래 빈 줄 지우기</button>
+                    </div>
+                </div>
+            </div>
+
 
                 <!-- 웹 서식 완전 제거 -->
                 <div class="mt-3 bg-gray-50 p-2.5 rounded border border-gray-200">
