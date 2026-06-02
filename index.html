@@ -1231,8 +1231,7 @@
                 downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward',
                 watermarkText: document.getElementById('watermarkInput') ? document.getElementById('watermarkInput').value : '',
                 watermarkPos: document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right',
-                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'text-gray-400'
- };
+                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'text-gray-400' };
             localStorage.setItem('autoSavedSettings', JSON.stringify(settings));
         }
 
@@ -1526,6 +1525,7 @@
             
             saveAutoSettings();
         }
+        
 
         function execCmd(command, value = null) {
             if (savedSelectionRange && command !== 'undo' && command !== 'redo') {
@@ -1636,9 +1636,6 @@
             return "#" + r + g + b;
         }
 
-                            
- function generateAutoAnalogousColor() {
-            let hsl = hexToHSL(gradColor1);
             
             function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
