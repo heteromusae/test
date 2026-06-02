@@ -471,7 +471,7 @@
                             
                             <button class="color-swatch" data-type="grad" data-c1="#232526" data-c2="#414345" style="background: linear-gradient(135deg, #232526, #414345)" onclick="setGradPreset(this, '#232526', '#414345')"></button>
                             <button class="color-swatch" data-type="grad" data-c1="#0f2027" data-c2="#203a43" style="background: linear-gradient(135deg, #0f2027, #203a43)" onclick="setGradPreset(this, '#0f2027', '#203a43')"></button>
-                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#000000" style="background: linear-gradient(135deg, #2c3e50, #000000)" onclick="setGradPreset(this, '#2c3e50', '#000000')"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#242424" style="background: linear-gradient(135deg, #2c3e50, #242424)" onclick="setGradPreset(this, '#2c3e50', '#000000')"></button>
                             <button class="color-swatch" data-type="grad" data-c1="#1e130c" data-c2="#3a2f28" style="background: linear-gradient(135deg, #1e130c, #3a2f28)" onclick="setGradPreset(this, '#1e130c', '#3a2f28')"></button>
                         </div>
 
@@ -1464,7 +1464,11 @@
             return "#" + r + g + b;
         }
 
-                 function generateAutoAnalogousColor() {
+                            
+ function generateAutoAnalogousColor() {
+            let hsl = hexToHSL(gradColor1);
+            
+            function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
             // 색상(Hue)을 0도 ~ 25도 사이에서 랜덤하게 이동
@@ -1481,16 +1485,6 @@
             let newS = Math.max(15, hsl.s - satDrop);
             
             let newHex = HSLToHex(newH, newS, newL);
-            
-            gradColor2 = newHex;
-            
-            // Pickr UI 및 화면 배경 업데이트 적용
-            if(gradPickr2) {
-                isSyncingGrad2 = true;
-                gradPickr2.setColor(newHex);
-                isSyncingGrad2 = false;
-            }
-            updateGlobalStyles();
         }
 
         /* ---------------------------------------------------- */
