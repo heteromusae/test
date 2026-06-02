@@ -1308,7 +1308,7 @@
             rawText = rawText.replace(/<br\s*[\/]?>/gi, '\n');
             
             rawText = rawText.replace(/<!--[\s\S]*?-->/g, ''); 
-            rawText = rawText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); 
+            rawText = rawText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''))
             rawText = rawText.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ''); 
             rawText = rawText.replace(/```[\s\S]*?```/g, ''); 
             rawText = rawText.replace(/<[^>]+>/g, ''); 
@@ -1464,9 +1464,6 @@
             return "#" + r + g + b;
         }
 
-                            
- function generateAutoAnalogousColor() {
-            let hsl = hexToHSL(gradColor1);
             
             function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
@@ -1905,3 +1902,4 @@
     </script>
 </body>
 </html>
+
