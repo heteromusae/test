@@ -5,20 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>로그 발췌 툴</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Marked.js (마크다운 파싱용) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <!-- Pickr (컬러 피커 라이브러리) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@400;700&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
@@ -51,46 +46,46 @@
         }
         @font-face { font-family: 'OngleIpSeaBreeze'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2510-1@1.0/Ownglyph_the_sea_breeze-Rg.woff2') format('woff2'); font-weight: normal; font-display: swap; }
         @font-face {
-    font-family: 'ChosunIlboMyungjo';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff');
-    font-weight: normal;
-    font-display: swap;
+            font-family: 'ChosunIlboMyungjo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
         }
         @font-face {
-    font-family: 'SchoolSafeStoneWall';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimDoldamM.woff2') format('woff2');
-    font-weight: 500;
-    font-display: swap;
+            font-family: 'SchoolSafeStoneWall';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimDoldamM.woff2') format('woff2');
+            font-weight: 500;
+            font-display: swap;
         }
         @font-face {
-    font-family: 'Yeongwol';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2507-2@1.0/YeongwolTTF-Regular.woff2') format('woff2');
-    font-weight: normal;
-    font-display: swap;
+            font-family: 'Yeongwol';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2507-2@1.0/YeongwolTTF-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
         }
         @font-face {
-    font-family: 'Yangjin';
-    src: url('https://cdn.jsdelivr.net/gh/supernovice-lab/font@0.9/yangjin.woff') format('woff');
-    font-weight: normal;
-    font-display: swap;
+            font-family: 'Yangjin';
+            src: url('https://cdn.jsdelivr.net/gh/supernovice-lab/font@0.9/yangjin.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
         }
         @font-face {
-    font-family: 'BookkMyungjo';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
-    font-weight: 400;
-    font-display: swap;
+            font-family: 'BookkMyungjo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
+            font-weight: 400;
+            font-display: swap;
         }
         @font-face {
-    font-family: 'Cafe24SuperMagic';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/Cafe24Supermagic-Regular-v1.0.woff2') format('woff2');
-    font-weight: 400;
-    font-display: swap;
+            font-family: 'Cafe24SuperMagic';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/Cafe24Supermagic-Regular-v1.0.woff2') format('woff2');
+            font-weight: 400;
+            font-display: swap;
         }
         @font-face {
-    font-family: 'GyeonggiMillenniumBackground';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-3@1.0/Batang_Regular.woff') format('woff');
-    font-weight: 400;
-    font-display: swap;
+            font-family: 'GyeonggiMillenniumBackground';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-3@1.0/Batang_Regular.woff') format('woff');
+            font-weight: 400;
+            font-display: swap;
         }
 
         /* 스크롤바 */
@@ -163,7 +158,6 @@
 </head>
 <body class="bg-gray-100 h-[100dvh] w-screen flex flex-col md:flex-row overflow-hidden font-noto-sans text-gray-800">
 
-    <!-- 도움말 팝업 (모달) -->
     <div id="helpModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-[110] flex justify-center items-center p-4">
         <div class="bg-white rounded-lg w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
             <div class="flex justify-between items-center p-4 border-b border-gray-200">
@@ -204,7 +198,6 @@
         </div>
     </div>
 
-    <!-- 텍스트 치환 모달 -->
     <div id="replaceModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-[110] flex justify-center items-center p-4">
         <div class="bg-white rounded-lg w-full max-w-sm flex flex-col overflow-hidden shadow-2xl">
             <div class="p-4 border-b border-gray-200 flex justify-between items-center">
@@ -223,7 +216,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">바꿀 내용</label>
-                    <input type="text" id="replaceWith" class="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-indigo-500" placeholder="예: 새 문구">
+                    <input type="text" id="replaceWith" class="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-indigo-500" placeholder="비워두면 해당 텍스트가 삭제됩니다.">
                 </div>
                 <div class="text-[10px] text-gray-500 bg-gray-50 p-2.5 rounded border border-gray-200">
                     문서 내의 텍스트를 지정한 텍스트로 일괄 변경합니다.
@@ -236,7 +229,6 @@
         </div>
     </div>
 
-    <!-- 미리보기 모달 -->
     <div id="previewModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-[100] flex flex-col">
         <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900 flex-shrink-0">
             <div class="text-white">
@@ -252,11 +244,9 @@
             </div>
         </div>
         <div id="previewContainer" class="flex-1 overflow-y-auto p-6 flex flex-col items-center gap-10 custom-scrollbar pb-20">
-            <!-- 캔버스 이미지 인젝션 -->
-        </div>
+            </div>
     </div>
 
-    <!-- 모바일 헤더 -->
     <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center z-20 flex-shrink-0 shadow-sm">
         <h1 class="text-base font-bold flex items-center gap-2 text-indigo-700">
             📖 로그 발췌 툴
@@ -272,7 +262,6 @@
         </div>
     </div>
 
-    <!-- 설정 사이드바 -->
     <aside id="sidebar" class="fixed inset-0 bg-white z-50 hidden flex-col md:relative md:flex md:w-[340px] md:border-r md:border-gray-200 shadow-sm flex-shrink-0">
         <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50 md:bg-white md:p-5">
             <h2 class="font-bold text-base flex items-baseline gap-2 text-indigo-700">
@@ -307,7 +296,6 @@
             
             <hr class="border-gray-100">
 
-            <!-- 텍스트 설정 -->
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">서식 설정</h3>
@@ -426,11 +414,9 @@
 
             <hr class="border-gray-100">
 
-            <!-- 테마 설정 -->
             <div class="space-y-4">
                 <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">테마 / 색상</h3>
                 
-                <!-- 배경색 -->
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="block text-xs font-medium text-gray-700">배경색</label>
@@ -471,27 +457,27 @@
                             
                             <button class="color-swatch" data-type="grad" data-c1="#232526" data-c2="#414345" style="background: linear-gradient(135deg, #232526, #414345)" onclick="setGradPreset(this, '#232526', '#414345')"></button>
                             <button class="color-swatch" data-type="grad" data-c1="#0f2027" data-c2="#203a43" style="background: linear-gradient(135deg, #0f2027, #203a43)" onclick="setGradPreset(this, '#0f2027', '#203a43')"></button>
-                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#000000" style="background: linear-gradient(135deg, #2c3e50, #000000)" onclick="setGradPreset(this, '#2c3e50', '#000000')"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#242424" style="background: linear-gradient(135deg, #2c3e50, #242424)" onclick="setGradPreset(this, '#2c3e50', '#000000')"></button>
                             <button class="color-swatch" data-type="grad" data-c1="#1e130c" data-c2="#3a2f28" style="background: linear-gradient(135deg, #1e130c, #3a2f28)" onclick="setGradPreset(this, '#1e130c', '#3a2f28')"></button>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mb-2">
-    <div>
-        <label class="block text-[10px] text-gray-500 mb-1">시작 색상</label>
-        <div class="flex items-center gap-1 grad-pickr">
-            <div id="gradPickr1"></div>
-        </div>
-    </div>
-    <div>
-        <div class="flex justify-between items-center mb-1">
-            <label class="block text-[10px] text-gray-500">끝 색상</label>
-            <button onclick="generateAutoAnalogousColor()" class="text-[9px] text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-1.5 py-0.5 rounded transition shadow-sm">자동 그라데이션</button>
-        </div>
-        <div class="flex items-center gap-1 grad-pickr">
-            <div id="gradPickr2"></div>
-        </div>
-    </div>
-</div>
+                            <div>
+                                <label class="block text-[10px] text-gray-500 mb-1">시작 색상</label>
+                                <div class="flex items-center gap-1 grad-pickr">
+                                    <div id="gradPickr1"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-[10px] text-gray-500">끝 색상</label>
+                                    <button onclick="generateAutoAnalogousColor()" class="text-[9px] text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-1.5 py-0.5 rounded transition shadow-sm">자동 그라데이션</button>
+                                </div>
+                                <div class="flex items-center gap-1 grad-pickr">
+                                    <div id="gradPickr2"></div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="mb-3">
                             <label class="block text-[10px] text-gray-500 mb-1">방향</label>
@@ -513,7 +499,6 @@
                     </div>
                 </div>
 
-                <!-- 글자색 -->
                 <div>
                     <label class="block text-xs font-medium mb-1.5 text-gray-700">글자색</label>
                     <div class="flex flex-wrap gap-1.5 mb-2">
@@ -547,12 +532,39 @@
 
             <hr class="border-gray-100">
 
-            <!-- 대사 자동 변환 기능 -->
             <div class="space-y-4">
-                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">텍스트 변환</h3>
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">하단 서명 (워터마크)</h3>
+                <div>
+                    <label class="block text-[10px] text-gray-500 mb-1">작가 / 캐릭터 이름 (비워두면 숨김)</label>
+                    <input type="text" id="watermarkInput" class="w-full border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50" placeholder="예: @heteromusae" oninput="document.getElementById('watermarkText').innerText = this.value; saveAutoSettings();">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">위치</label>
+                        <select id="watermarkPos" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="updateWatermarkStyle()">
+                            <option value="right" selected>오른쪽 아래</option>
+                            <option value="left">왼쪽 아래</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">색상</label>
+                        <select id="watermarkColor" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="updateWatermarkStyle()">
+                            <option value="text-gray-400" selected>회색 (기본)</option>
+                            <option value="text-gray-700">진한 회색</option>
+                            <option value="text-black">검은색</option>
+                            <option value="text-white">흰색</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">텍스트 / 서식 변환</h3>
                 
                 <div>
-                    <label class="block text-xs font-medium mb-1 text-gray-700">대사 자동 변환</label>
+                    <label class="block text-[10px] font-bold text-gray-600 mb-1">대사 일괄 자동 변환</label>
                     <div class="flex gap-2">
                         <select id="quoteStyle" class="flex-1 border border-gray-300 rounded p-1.5 text-xs outline-none focus:border-indigo-500 bg-gray-50">
                             <option value="smart">“ ” (둥근 따옴표)</option>
@@ -563,36 +575,49 @@
                         </button>
                     </div>
                     <p class="text-[10px] text-gray-500 mt-1.5 leading-tight">
-                        별표로 감싸지지 않은 문단에 따옴표를 씌우고, 글 전체의 별표를 삭제합니다. (기존 서식은 초기화됩니다)
+                        별표(*) 없는 문단에 따옴표 추가 및 전체 별표 제거
                     </p>
                 </div>
 
-                <!-- 웹 서식 완전 제거 -->
-                <div class="mt-3 bg-gray-50 p-2.5 rounded border border-gray-200">
-                    <label class="block text-xs font-bold text-gray-600 mb-1">웹 서식 정리</label>
-                    <p class="text-[10px] text-gray-500 mb-2.5 leading-tight">
-                        로그의 style 태그 내용, 숨겨진 텍스트, 코드블럭을 모두 삭제하고 텍스트만 남깁니다.
-                    </p>
-                    <button onclick="cleanHtmlAndHidden()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">
-                        정리 실행하기
-                    </button>
+                <div class="bg-gray-50 p-2.5 rounded border border-gray-200 space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-1.5">세부 기호 컨트롤</label>
+                        <div class="grid grid-cols-2 gap-1 mb-1">
+                            <button onclick="modifyTextSpecific('addQuote')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm">+ 따옴표 추가</button>
+                            <button onclick="modifyTextSpecific('removeQuote')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm text-red-600">- 따옴표 제거</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1">
+                            <button onclick="modifyTextSpecific('addStar')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm">+ 별(*) 추가</button>
+                            <button onclick="modifyTextSpecific('removeStar')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm text-red-600">- 별(*) 제거</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-1.5">따옴표 모양 변경</label>
+                        <div class="grid grid-cols-2 gap-1">
+                            <button onclick="modifyTextSpecific('toSmartDouble')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm">" " ➔ “ ”</button>
+                            <button onclick="modifyTextSpecific('toStraightDouble')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm">“ ” ➔ " "</button>
+                            <button onclick="modifyTextSpecific('toSmartSingle')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm">' ' ➔ ‘ ’</button>
+                            <button onclick="modifyTextSpecific('toStraightSingle')" class="bg-white hover:bg-gray-100 border border-gray-300 text-[10px] py-1 rounded transition shadow-sm">‘ ’ ➔ ' '</button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 위아래 빈 줄 제거 -->
-                <div class="mt-3 bg-gray-50 p-2.5 rounded border border-gray-200">
-                    <label class="block text-xs font-bold text-gray-600 mb-1">위아래 여백(빈 줄) 제거</label>
-                    <p class="text-[10px] text-gray-500 mb-2.5 leading-tight">
-                        로그 맨 위와 맨 아래에 들어간 불필요한 엔터(빈 줄)를 일괄 삭제하여 깔끔하게 정리합니다.
-                    </p>
-                    <button onclick="trimEmptyLines()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">
-                        위아래 빈 줄 지우기
-                    </button>
+                <div class="bg-gray-50 p-2.5 rounded border border-gray-200 space-y-2.5">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-1">폰트 / 색상 태그만 지우기</label>
+                        <button onclick="removeFontAndColorTags()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">태그 지우기</button>
+                    </div>
+                    <hr class="border-gray-200">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-1">웹 서식 전체 정리</label>
+                        <button onclick="cleanHtmlAndHidden()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm mb-1.5">스타일/숨김 텍스트 싹 지우기</button>
+                        <button onclick="trimEmptyLines()" class="w-full bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-bold py-1.5 px-3 rounded text-xs transition shadow-sm">위아래 빈 줄 지우기</button>
+                    </div>
                 </div>
             </div>
 
             <hr class="border-gray-100">
 
-            <!-- 발췌 이미지 설정 -->
             <div class="space-y-4">
                 <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">출력 설정</h3>
                 
@@ -611,7 +636,6 @@
                             <option value="0.6667">3 : 2</option>
                             <option value="0.625">16 : 10</option>
                             <option value="0.5625">16 : 9</option>
-                            
                         </optgroup>
                         <optgroup label="기타">
                             <option value="1.0">1 : 1</option>
@@ -650,18 +674,14 @@
         </div>
     </aside>
 
-    <!-- 에디터 영역 -->
     <main class="flex-1 flex flex-col h-full min-w-0 bg-[#eef2f6] overflow-hidden">
         
-        <!-- 상단 툴바 -->
         <header class="bg-white border-b border-gray-200 p-2 flex items-center gap-1 overflow-x-auto whitespace-nowrap shadow-sm z-10 flex-shrink-0">
             
-            <!-- 전체 삭제 (맨 왼쪽) -->
             <button class="toolbar-btn text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-100" onmousedown="event.preventDefault()" onclick="clearEditorContent()" title="내용 전체 삭제">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
 
-            <!-- 클립보드 붙여넣기 -->
             <button class="toolbar-btn text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100" onmousedown="event.preventDefault()" onclick="pasteFromClipboard()" title="클립보드 내용으로 전체 덮어쓰기">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
             </button>
@@ -703,11 +723,10 @@
 
             <div class="w-px h-5 bg-gray-300 mx-1 flex-shrink-0"></div>
 
-            <button class="toolbar-btn px-2 w-auto text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 flex-shrink-0" onmousedown="event.preventDefault()" onclick="applyMarkdown()">
-                M↓ 마크다운
+            <button class="toolbar-btn px-2 w-auto text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 flex-shrink-0" onmousedown="event.preventDefault()" onclick="applyMarkdownAndHTML()" title="선택한 텍스트의 마크다운 기호나 HTML 태그를 실제 서식으로 변환합니다.">
+                M↓ 마크다운 &amp; HTML 적용
             </button>
 
-            <!-- 텍스트 치환 기능 -->
             <button class="toolbar-btn px-2 w-auto text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded ml-1 flex-shrink-0" onmousedown="event.preventDefault()" onclick="openReplaceModal()" title="텍스트 찾기/바꾸기">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="mr-1 inline"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 치환
@@ -718,12 +737,12 @@
             </button>
         </header>
 
-        <!-- 스크롤 본문 -->
         <div class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start relative" id="scroll-area">
             
             <div id="export-wrapper" class="w-full max-w-[500px] bg-white relative">
-                <!-- 종이 질감 오버레이 -->
                 <div id="texture-overlay" class="absolute inset-0 z-10 pointer-events-none opacity-0"></div>
+                
+                <div id="watermarkText" class="absolute bottom-4 right-8 z-30 text-gray-400 opacity-80 text-[10px] font-medium pointer-events-none empty:hidden"></div>
                 
                 <div id="editor" contenteditable="true" class="w-full outline-none font-noto-serif relative z-20" style="font-size: 10px; line-height: 1.8; letter-spacing: -0.5px; color: #111111; padding: 40px;" spellcheck="false">이곳에 발췌할 로그를 붙여넣으세요. </div>
             </div>
@@ -886,7 +905,7 @@
 
         function executeReplace() {
             const target = document.getElementById('replaceTarget').value;
-            const withStr = document.getElementById('replaceWith').value;
+            const withStr = document.getElementById('replaceWith').value; // 비어있으면 삭제로 작동
 
             if (!target) {
                 alert('찾을 내용을 입력해주세요.');
@@ -894,11 +913,9 @@
             }
 
             try {
-                // g(전체) 플래그를 사용하여 정규식 객체 생성
                 const regex = new RegExp(target, 'g');
                 const editor = document.getElementById('editor');
                 
-                // 변경할 내용이 있는지 먼저 확인
                 const walkerTest = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
                 let hasMatch = false;
                 let testNode;
@@ -914,7 +931,6 @@
                     return;
                 }
 
-                // 브라우저 Undo 스택에 저장하기 위해 임시 복제본에서 작업 후 insertHTML 처리
                 const clone = editor.cloneNode(true);
                 const walker = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT, null, false);
                 let node;
@@ -931,7 +947,6 @@
                 if (matchCount > 0) {
                     editor.focus();
                     document.execCommand('selectAll', false, null);
-                    // 전체를 새로운 HTML로 덮어씌움으로써 하나의 Undo/Redo 기록으로 만듦
                     document.execCommand('insertHTML', false, clone.innerHTML);
                 }
 
@@ -1086,6 +1101,15 @@
             applyCustomColor('bg', "#ffffff");
             applyCustomColor('text', "#111111");
             
+            // 워터마크 초기화
+            if(document.getElementById('watermarkInput')) {
+                document.getElementById('watermarkInput').value = '';
+                document.getElementById('watermarkPos').value = 'right';
+                document.getElementById('watermarkColor').value = 'text-gray-400';
+                document.getElementById('watermarkText').innerText = '';
+                updateWatermarkStyle();
+            }
+
             toggleTexture();
             updateGlobalStyles();
         }
@@ -1170,7 +1194,11 @@
                 ratio: document.getElementById('imageRatio').value,
                 quoteStyle: document.getElementById('quoteStyle').value,
                 autoTrim: document.getElementById('autoTrim').checked,
-                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward'
+                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward',
+                
+                watermarkText: document.getElementById('watermarkInput') ? document.getElementById('watermarkInput').value : '',
+                watermarkPos: document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right',
+                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'text-gray-400'
             };
             localStorage.setItem('autoSavedSettings', JSON.stringify(settings));
         }
@@ -1190,6 +1218,7 @@
             saveAutoSettings();
         }
 
+        /* --- 텍스트 자동 변환 / 제어 함수들 --- */
         function formatDialogue() {
             const editor = document.getElementById('editor');
             const quoteStyle = document.getElementById('quoteStyle').value;
@@ -1198,14 +1227,12 @@
             if (!rawText.trim()) return;
 
             let lines = rawText.split('\n');
-            
             let newLines = lines.map(line => {
                 let trimmed = line.trim();
                 if (!trimmed) return null; 
                 
                 let isWrapped = trimmed.startsWith('*') && trimmed.endsWith('*');
                 let cleaned = trimmed.replace(/\*/g, '').trim();
-                
                 if (!cleaned) return null; 
                 
                 if (!isWrapped) {
@@ -1222,6 +1249,50 @@
             const filteredLines = newLines.filter(line => line !== null);
             const finalString = filteredLines.join('\n\n'); 
 
+            editor.focus();
+            document.execCommand('selectAll', false, null);
+            document.execCommand('insertText', false, finalString);
+        }
+
+        function modifyTextSpecific(action) {
+            const editor = document.getElementById('editor');
+            let rawText = editor.innerText;
+            if (!rawText.trim()) return;
+
+            let lines = rawText.split('\n');
+            let newLines = lines.map(line => {
+                let text = line.trim();
+                if (!text) return line; 
+
+                switch(action) {
+                    case 'addStar':
+                        if(!text.startsWith('*')) text = '*' + text;
+                        if(!text.endsWith('*')) text = text + '*';
+                        return text;
+                    case 'removeStar':
+                        return text.replace(/\*/g, '');
+                    case 'addQuote':
+                        if (!(text.startsWith('*') && text.endsWith('*'))) {
+                            if (!/^["“”'‘’]/.test(text)) text = '“' + text;
+                            if (!/["“”'‘’]$/.test(text)) text = text + '”';
+                        }
+                        return text;
+                    case 'removeQuote':
+                        return text.replace(/^["“”'‘’]+|["“”'‘’]+$/g, '');
+                    case 'toSmartDouble':
+                        return text.replace(/"(.*?)"/g, '“$1”').replace(/^"/, '“').replace(/"$/, '”');
+                    case 'toStraightDouble':
+                        return text.replace(/[“”]/g, '"');
+                    case 'toSmartSingle':
+                        return text.replace(/'(.*?)'/g, '‘$1’').replace(/^'/, '‘').replace(/'$/, '’');
+                    case 'toStraightSingle':
+                        return text.replace(/[‘’]/g, "'");
+                    default:
+                        return text;
+                }
+            });
+
+            const finalString = newLines.join('\n');
             editor.focus();
             document.execCommand('selectAll', false, null);
             document.execCommand('insertText', false, finalString);
@@ -1299,15 +1370,12 @@
             });
             
             let rawText = editor.innerHTML;
-            
             rawText = rawText.replace(/<details[^>]*>[\s\S]*?<\/details>/gi, '');
             rawText = rawText.replace(/<summary[^>]*>[\s\S]*?<\/summary>/gi, '');
-            
             rawText = rawText.replace(/<\/div>/gi, '\n');
             rawText = rawText.replace(/<\/p>/gi, '\n');
             rawText = rawText.replace(/<br\s*[\/]?>/gi, '\n');
-            
-            rawText = rawText.replace(/<!--[\s\S]*?-->/g, ''); 
+            rawText = rawText.replace(//g, ''); 
             rawText = rawText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ''); 
             rawText = rawText.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ''); 
             rawText = rawText.replace(/```[\s\S]*?```/g, ''); 
@@ -1320,7 +1388,6 @@
             finalStr = finalStr.replace(/<details[^>]*>[\s\S]*?<\/details>/gi, '');
             finalStr = finalStr.replace(/<summary[^>]*>[\s\S]*?<\/summary>/gi, '');
             finalStr = finalStr.replace(/```[\s\S]*?```/g, ''); 
-            
             finalStr = finalStr.replace(/\n{3,}/g, '\n\n').trim();
             
             editor.focus();
@@ -1328,7 +1395,37 @@
             document.execCommand('insertText', false, finalStr);
         }
 
-        function applyMarkdown() {
+        function removeFontAndColorTags() {
+            const editor = document.getElementById('editor');
+            
+            const fonts = editor.querySelectorAll('font');
+            fonts.forEach(f => {
+                const frag = document.createDocumentFragment();
+                while(f.firstChild) frag.appendChild(f.firstChild);
+                f.parentNode.replaceChild(frag, f);
+            });
+
+            const styledElements = editor.querySelectorAll('[style]');
+            styledElements.forEach(el => {
+                el.style.color = '';
+                el.style.backgroundColor = '';
+                el.style.fontFamily = '';
+                el.style.fontSize = '';
+                if (!el.getAttribute('style').trim()) {
+                    el.removeAttribute('style');
+                }
+                if (el.tagName === 'SPAN' && !el.hasAttributes()) {
+                    const frag = document.createDocumentFragment();
+                    while(el.firstChild) frag.appendChild(el.firstChild);
+                    el.parentNode.replaceChild(frag, el);
+                }
+            });
+            editor.focus();
+            editor.blur();
+        }
+
+        /* 마크다운 + HTML 통합 적용 */
+        function applyMarkdownAndHTML() {
             if (savedSelectionRange) {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
@@ -1337,7 +1434,7 @@
 
             const sel = window.getSelection();
             if (!sel.rangeCount || sel.isCollapsed) {
-                alert("마크다운을 적용할 텍스트를 드래그하여 선택해주세요.");
+                alert("적용할 텍스트(마크다운/HTML)를 드래그하여 선택해주세요.");
                 return;
             }
 
@@ -1390,13 +1487,25 @@
                 return;
             }
 
-            // 기본 브라우저 서식 해제
             document.execCommand('removeFormat', false, null);
             document.execCommand('backColor', false, 'transparent');
-            
             document.getElementById('editor').focus();
         }
 
+        function updateWatermarkStyle() {
+            const wm = document.getElementById('watermarkText');
+            if(!wm) return;
+            const pos = document.getElementById('watermarkPos').value;
+            const color = document.getElementById('watermarkColor').value;
+            
+            wm.className = `absolute bottom-4 z-30 opacity-80 text-[10px] font-medium pointer-events-none empty:hidden ${color}`;
+            if(pos === 'right') wm.classList.add('right-8');
+            else wm.classList.add('left-8');
+            
+            saveAutoSettings();
+        }
+
+        /* --- 캔버스 & 렌더링 함수들 --- */
         function closePreview() {
             document.getElementById('previewModal').classList.add('hidden');
             document.getElementById('previewContainer').innerHTML = ''; 
@@ -1406,7 +1515,6 @@
             if (startY + targetHeight >= ctx.canvas.height) {
                 return ctx.canvas.height - startY;
             }
-            
             const checkHeight = Math.floor(targetHeight - minHeight);
             if (checkHeight <= 0) return targetHeight;
             
@@ -1426,7 +1534,8 @@
             }
             return targetHeight; 
         }
-                /* --- 그라데이션 자동 연한 유사색 생성 로직 --- */
+
+        /* --- 그라데이션 자동 연한 유사색 생성 로직 --- */
         function hexToHSL(H) {
             let r = 0, g = 0, b = 0;
             if (H.length === 4) {
@@ -1464,6 +1573,7 @@
             return "#" + r + g + b;
         }
 
+        
                  function generateAutoAnalogousColor() {
             let hsl = hexToHSL(gradColor1);
             
@@ -1492,11 +1602,7 @@
             }
             updateGlobalStyles();
         }
-            
-    
-           
-
-        /* ---------------------------------------------------- */
+        
 
         function mixHexColors(c1, c2, percent) {
             const parse = c => {
@@ -1543,7 +1649,6 @@
             wrapper.style.background = 'transparent';
 
             try {
-                // 브라우저 렌더링 합성을 기다리기 위해 여유 시간을 둡니다.
                 await new Promise(r => setTimeout(r, 200));
 
                 const fullCanvas = await html2canvas(wrapper, {
@@ -1556,7 +1661,6 @@
                     windowHeight: wrapper.scrollHeight
                 });
 
-                // 캡처 후 원본 배경 원복
                 wrapper.style.background = originalBg;
 
                 const fullCtx = fullCanvas.getContext('2d');
@@ -1600,7 +1704,6 @@
                         ctx.fillStyle = currentBgColor;
                     }
                     ctx.fillRect(0, 0, width, totalHeight);
-                    
                     ctx.drawImage(fullCanvas, 0, 0);
                     
                     const imgUrl = sliceCanvas.toDataURL("image/png", 1.0);
@@ -1809,7 +1912,11 @@
                 ratio: document.getElementById('imageRatio').value,
                 quoteStyle: document.getElementById('quoteStyle').value,
                 autoTrim: document.getElementById('autoTrim').checked,
-                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward'
+                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward',
+                
+                watermarkText: document.getElementById('watermarkInput') ? document.getElementById('watermarkInput').value : '',
+                watermarkPos: document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right',
+                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'text-gray-400'
             };
 
             let presets = JSON.parse(localStorage.getItem('logPresets') || '{}');
@@ -1879,6 +1986,14 @@
             applyCustomColor('bg', preset.bgColor || "#ffffff");
             applyCustomColor('text', preset.textColor || "#111111");
             
+            if(document.getElementById('watermarkInput')) {
+                document.getElementById('watermarkInput').value = preset.watermarkText || '';
+                document.getElementById('watermarkPos').value = preset.watermarkPos || 'right';
+                document.getElementById('watermarkColor').value = preset.watermarkColor || 'text-gray-400';
+                document.getElementById('watermarkText').innerText = preset.watermarkText || '';
+                updateWatermarkStyle();
+            }
+
             toggleTexture();
             updateGlobalStyles();
         }
