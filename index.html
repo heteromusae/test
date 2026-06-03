@@ -471,7 +471,7 @@
                             
                             <button class="color-swatch" data-type="grad" data-c1="#232526" data-c2="#414345" style="background: linear-gradient(135deg, #232526, #414345)" onclick="setGradPreset(this, '#232526', '#414345')"></button>
                             <button class="color-swatch" data-type="grad" data-c1="#0f2027" data-c2="#203a43" style="background: linear-gradient(135deg, #0f2027, #203a43)" onclick="setGradPreset(this, '#0f2027', '#203a43')"></button>
-                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#000000" style="background: linear-gradient(135deg, #2c3e50, #000000)" onclick="setGradPreset(this, '#2c3e50', '#000000')"></button>
+                            <button class="color-swatch" data-type="grad" data-c1="#2c3e50" data-c2="#242424" style="background: linear-gradient(135deg, #2c3e50, #242424)" onclick="setGradPreset(this, '#2c3e50', '#242424')"></button>
                             <button class="color-swatch" data-type="grad" data-c1="#1e130c" data-c2="#3a2f28" style="background: linear-gradient(135deg, #1e130c, #3a2f28)" onclick="setGradPreset(this, '#1e130c', '#3a2f28')"></button>
                         </div>
 
@@ -562,21 +562,39 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] text-gray-500 mb-1">위치</label>
-                        <select id="watermarkPos" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="saveAutoSettings()">
-                            <option value="right" selected>오른쪽 아래</option>
-                            <option value="left">왼쪽 아래</option>
+                        <label class="block text-[10px] text-gray-500 mb-1">폰트</label>
+                        <select id="watermarkFont" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="saveAutoSettings()">
+                            <option value="auto" selected>본문 폰트 따라가기</option>
+                            <option value="'Noto Serif KR', serif">Noto Serif KR</option>
+                            <option value="'Nanum Myeongjo', serif">나눔명조</option>
+                            <option value="'Gowun Batang', serif">고운바탕</option>
+                            <option value="'BookkMyungjo', serif">부크크 명조</option>
+                            <option value="'ChosunIlboMyungjo', serif">조선일보명조</option>
+                            <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                            <option value="'Pretendard', sans-serif">프리텐다드</option>
+                            <option value="'OngleipParkDahyeon', sans-serif">온글잎 박다현</option>
+                            <option value="'NeoDonggeunmo', sans-serif">네오둥근모</option>
+                            <option value="'SchoolSafeStoneWall', sans-serif">학교안심 돌담</option>
+                            <option value="'Yeongwol', sans-serif">영월체</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-[10px] text-gray-500 mb-1">색상</label>
-                        <select id="watermarkColor" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500" onchange="saveAutoSettings()">
-                            <option value="text-gray-400" selected>회색 (기본)</option>
-                            <option value="text-gray-700">진한 회색</option>
-                            <option value="text-black">검은색</option>
-                            <option value="text-white">흰색</option>
+                        <select id="watermarkColor" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="saveAutoSettings()">
+                            <option value="auto" selected>본문 색상 따라가기</option>
+                            <option value="#9ca3af">연한 회색</option>
+                            <option value="#4b5563">진한 회색</option>
+                            <option value="#000000">검은색</option>
+                            <option value="#ffffff">흰색</option>
                         </select>
                     </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-gray-500 mb-1">위치</label>
+                    <select id="watermarkPos" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="saveAutoSettings()">
+                        <option value="right" selected>오른쪽 아래</option>
+                        <option value="left">왼쪽 아래</option>
+                    </select>
                 </div>
             </div>
 
@@ -1221,11 +1239,11 @@
                 ratio: document.getElementById('imageRatio').value,
                 quoteStyle: document.getElementById('quoteStyle').value,
                 autoTrim: document.getElementById('autoTrim').checked,
-                downloadOrder: document.querySelector('input[name="dlOrder"]:checked') ? document.querySelector('input[name="dlOrder"]:checked').value : 'forward',
                 watermarkAuthor: document.getElementById('watermarkAuthor') ? document.getElementById('watermarkAuthor').value : '',
                 watermarkCharacter: document.getElementById('watermarkCharacter') ? document.getElementById('watermarkCharacter').value : '',
                 watermarkPos: document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right',
-                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'text-gray-400'
+                watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'auto',
+                watermarkFont: document.getElementById('watermarkFont') ? document.getElementById('watermarkFont').value : 'auto'
             };
             localStorage.setItem('autoSavedSettings', JSON.stringify(settings));
         }
@@ -1499,7 +1517,7 @@
             document.execCommand('selectAll', false, null);
             document.execCommand('insertText', false, finalString);
         }
-/* --- 워터마크 캔버스에 직접 그리기 --- */
+//* --- 워터마크 캔버스에 직접 그리기 --- */
         function drawWatermarkOnCanvas(ctx, width, height) {
             const author = document.getElementById('watermarkAuthor') ? document.getElementById('watermarkAuthor').value.trim() : '';
             const charName = document.getElementById('watermarkCharacter') ? document.getElementById('watermarkCharacter').value.trim() : '';
@@ -1510,23 +1528,32 @@
             else if(charName) wmText = charName;
 
             if(wmText) {
-                const wmColorClass = document.getElementById('watermarkColor').value;
-                const wmPos = document.getElementById('watermarkPos').value;
+                const wmColorVal = document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'auto';
+                const wmFontVal = document.getElementById('watermarkFont') ? document.getElementById('watermarkFont').value : 'auto';
+                const wmPos = document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right';
                 
-                let fillColor = "#9ca3af"; // text-gray-400
-                if(wmColorClass === "text-gray-700") fillColor = "#374151";
-                if(wmColorClass === "text-black") fillColor = "#000000";
-                if(wmColorClass === "text-white") fillColor = "#ffffff";
+                // 1. 색상 설정 (auto면 본문 텍스트 색상 그대로 따라감)
+                let fillColor = wmColorVal === 'auto' ? currentTextColor : wmColorVal;
+                
+                // 기존 프리셋(회색 등) 호환성 유지
+                if(fillColor === "text-gray-400") fillColor = "#9ca3af";
+                if(fillColor === "text-gray-700") fillColor = "#374151";
+                if(fillColor === "text-black") fillColor = "#000000";
+                if(fillColor === "text-white") fillColor = "#ffffff";
                 
                 ctx.fillStyle = fillColor;
-                ctx.globalAlpha = 0.8; // 투명도
+                ctx.globalAlpha = 0.8; // 은은한 투명도
                 
-                // 폰트 설정 (에디터에 적용된 폰트를 캔버스에도 동일하게 적용)
-                let fontFamily = document.getElementById('globalFont').value.split(',')[0].replace(/['"]/g, '');
+                // 2. 폰트 설정 (auto면 본문 폰트 그대로 따라감)
+                let fontFamily = wmFontVal === 'auto' 
+                    ? document.getElementById('globalFont').value.split(',')[0].replace(/['"]/g, '')
+                    : wmFontVal.split(',')[0].replace(/['"]/g, '');
+                
                 ctx.font = `500 40px '${fontFamily}', sans-serif`; 
                 
-                const paddingX = 32; 
-                const paddingY = 32; 
+                // 3. 여백 설정 (기존 32에서 100으로 대폭 늘려 구석에서 탈출시킴)
+                const paddingX = 50; 
+                const paddingY = 50; 
                 
                 ctx.textBaseline = "bottom";
                 if(wmPos === "right") {
@@ -1538,7 +1565,7 @@
                 }
                 ctx.globalAlpha = 1.0;
             }
-        } 
+        }
         function execCmd(command, value = null) {
             if (savedSelectionRange && command !== 'undo' && command !== 'redo') {
                 const sel = window.getSelection();
@@ -1873,7 +1900,7 @@
                         );
 
                         drawWatermarkOnCanvas(ctx, width, ACTUAL_SLICE_HEIGHT);
-                        
+
                         const imgUrl = sliceCanvas.toDataURL("image/png", 1.0);
                         previewImages.push(imgUrl);
 
@@ -2066,11 +2093,14 @@
             
             toggleTexture();
             
-            if(document.getElementById('watermarkAuthor')) {
+           if(document.getElementById('watermarkAuthor')) {
                 document.getElementById('watermarkAuthor').value = preset.watermarkAuthor || '';
                 document.getElementById('watermarkCharacter').value = preset.watermarkCharacter || '';
                 document.getElementById('watermarkPos').value = preset.watermarkPos || 'right';
-                document.getElementById('watermarkColor').value = preset.watermarkColor || 'text-gray-400';
+                document.getElementById('watermarkColor').value = preset.watermarkColor || 'auto';
+                if (document.getElementById('watermarkFont')) {
+                    document.getElementById('watermarkFont').value = preset.watermarkFont || 'auto';
+                }
             }
 
             updateGlobalStyles();
