@@ -549,7 +549,7 @@
 
           <!-- 하단 서명 (워터마크) -->
             <div class="space-y-4">
-                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">하단 서명</h3>
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">서명</h3>
                 <div class="flex gap-2">
                     <div class="flex-1">
                         <label class="block text-[10px] text-gray-500 mb-1">제작자</label>
@@ -589,12 +589,24 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] text-gray-500 mb-1">위치</label>
-                    <select id="watermarkPos" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="saveAutoSettings()">
-                        <option value="right" selected>오른쪽 아래</option>
-                        <option value="left">왼쪽 아래</option>
-                    </select>
+               <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">위치</label>
+                        <select id="watermarkPos" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="saveAutoSettings()">
+                            <option value="right" selected>오른쪽 아래</option>
+                            <option value="left">왼쪽 아래</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">크기</label>
+                        <select id="watermarkSize" class="w-full border border-gray-300 rounded p-1 text-xs outline-none focus:border-indigo-500 bg-gray-50" onchange="saveAutoSettings()">
+                            <option value="24">작게</option>
+                            <option value="32">약간 작게</option>
+                            <option value="40" selected>보통 (기본)</option>
+                            <option value="52">약간 크게</option>
+                            <option value="64">크게</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -1243,7 +1255,8 @@
                 watermarkCharacter: document.getElementById('watermarkCharacter') ? document.getElementById('watermarkCharacter').value : '',
                 watermarkPos: document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right',
                 watermarkColor: document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'auto',
-                watermarkFont: document.getElementById('watermarkFont') ? document.getElementById('watermarkFont').value : 'auto'
+                watermarkFont: document.getElementById('watermarkFont') ? document.getElementById('watermarkFont').value : 'auto',
+                watermarkSize: document.getElementById('watermarkSize') ? document.getElementById('watermarkSize').value : '40'
             };
             localStorage.setItem('autoSavedSettings', JSON.stringify(settings));
         }
@@ -1435,35 +1448,37 @@
             const editor = document.getElementById('editor');
             const clone = editor.cloneNode(true);
             
-            // 1. <font> 태그 벗기기
-            const fonts = clone.querySelectorAll('font');
-            fonts.forEach(f => {
-                while(f.firstChild) f.parentNode.insertBefore(f.firstChild, f);
-                f.remove();
-            });
+            // 1. 숨어들어온 <style> CSS 블록 통째로 삭제
+            const styleTags = clone.querySelectorAll('style');
+            styleTags.forEach(el => el.remove());
 
-            // 2. 인라인 style 에서 color, background, font 속성만 지우기
-            const styledElements = clone.querySelectorAll('[style]');
-            styledElements.forEach(el => {
-                el.style.color = '';
-                el.style.backgroundColor = '';
-                el.style.fontFamily = '';
-                el.style.fontSize = '';
-                
-                // 스타일이 비었으면 style 속성 제거
-                if (!el.getAttribute('style').trim()) el.removeAttribute('style');
-                
-                // span인데 껍데기만 남았으면 태그 벗기기
-                if (el.tagName === 'SPAN' && el.attributes.length === 0) {
-                    while(el.firstChild) el.parentNode.insertBefore(el.firstChild, el);
-                    el.remove();
+            // 2. <font>, <span> 껍데기 태그 완벽 해체 (안의 텍스트만 꺼냄)
+            let wrapperTag = clone.querySelector('font, span');
+            while (wrapperTag) {
+                const frag = document.createDocumentFragment();
+                while(wrapperTag.firstChild) {
+                    frag.appendChild(wrapperTag.firstChild);
                 }
+                wrapperTag.parentNode.replaceChild(frag, wrapperTag);
+                wrapperTag = clone.querySelector('font, span');
+            }
+
+            // 3. 남은 문단/줄바꿈 구조 태그들에 붙어있는 스타일, 색상 속성 전부 날리기
+            const allElements = clone.querySelectorAll('*');
+            allElements.forEach(el => {
+                el.removeAttribute('style');
+                el.removeAttribute('color');
+                el.removeAttribute('face');
+                el.removeAttribute('size');
+                el.removeAttribute('class'); 
             });
             
-            editor.innerHTML = clone.innerHTML;
+            // 4. 에디터에 덮어쓰기 (Ctrl+Z 실행 취소 지원)
             editor.focus();
-            editor.blur(); // 저장 옵저버 트리거
+            document.execCommand('selectAll', false, null);
+            document.execCommand('insertHTML', false, clone.innerHTML);
         }
+            
 
         /* --- 별/따옴표 세분화 제어 --- */
         function modifyTextSpecific(action) {
@@ -1531,29 +1546,29 @@
                 const wmColorVal = document.getElementById('watermarkColor') ? document.getElementById('watermarkColor').value : 'auto';
                 const wmFontVal = document.getElementById('watermarkFont') ? document.getElementById('watermarkFont').value : 'auto';
                 const wmPos = document.getElementById('watermarkPos') ? document.getElementById('watermarkPos').value : 'right';
+                // 사이즈 변수 추가
+                const wmSizeVal = document.getElementById('watermarkSize') ? document.getElementById('watermarkSize').value : '40';
                 
-                // 1. 색상 설정 (auto면 본문 텍스트 색상 그대로 따라감)
+                // 1. 색상 설정
                 let fillColor = wmColorVal === 'auto' ? currentTextColor : wmColorVal;
-                
-                // 기존 프리셋(회색 등) 호환성 유지
                 if(fillColor === "text-gray-400") fillColor = "#9ca3af";
                 if(fillColor === "text-gray-700") fillColor = "#374151";
                 if(fillColor === "text-black") fillColor = "#000000";
                 if(fillColor === "text-white") fillColor = "#ffffff";
                 
                 ctx.fillStyle = fillColor;
-                ctx.globalAlpha = 0.8; // 은은한 투명도
+                ctx.globalAlpha = 0.8;
                 
-                // 2. 폰트 설정 (auto면 본문 폰트 그대로 따라감)
+                // 2. 폰트 및 크기 설정 (기존 40px 고정에서 선택한 사이즈로 변경)
                 let fontFamily = wmFontVal === 'auto' 
                     ? document.getElementById('globalFont').value.split(',')[0].replace(/['"]/g, '')
                     : wmFontVal.split(',')[0].replace(/['"]/g, '');
                 
-                ctx.font = `500 40px '${fontFamily}', sans-serif`; 
+                ctx.font = `500 ${wmSizeVal}px '${fontFamily}', sans-serif`; 
                 
-                // 3. 여백 설정 (기존 32에서 100으로 대폭 늘려 구석에서 탈출시킴)
-                const paddingX = 50; 
-                const paddingY = 50; 
+                // 3. 여백 및 텍스트 렌더링
+                const paddingX = 45; 
+                const paddingY = 45; 
                 
                 ctx.textBaseline = "bottom";
                 if(wmPos === "right") {
@@ -1566,6 +1581,8 @@
                 ctx.globalAlpha = 1.0;
             }
         }
+
+
         function execCmd(command, value = null) {
             if (savedSelectionRange && command !== 'undo' && command !== 'redo') {
                 const sel = window.getSelection();
@@ -2100,6 +2117,10 @@
                 document.getElementById('watermarkColor').value = preset.watermarkColor || 'auto';
                 if (document.getElementById('watermarkFont')) {
                     document.getElementById('watermarkFont').value = preset.watermarkFont || 'auto';
+                }
+                /* ▼ 아래 3줄 추가 ▼ */
+                if (document.getElementById('watermarkSize')) {
+                    document.getElementById('watermarkSize').value = preset.watermarkSize || '40';
                 }
             }
 
