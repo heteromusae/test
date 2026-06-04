@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>소설 발췌 편집기</title>
+    <!-- 웹 폰트 (dom-to-image-more가 이 리소스를 추적하여 이미지 내부에 Base64로 자동 내장시킴) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -35,6 +36,14 @@
             overflow: hidden;
         }
 
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
         header {
             background-color: var(--bg-toolbar);
             padding: 12px 24px;
@@ -42,7 +51,6 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            z-index: 10;
         }
 
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -142,6 +150,7 @@
 
         .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
         .editor-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        
         .workspace { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: auto; }
 
         #svg-container {
@@ -155,13 +164,15 @@
 
         svg { display: block; width: 100%; height: 100%; object-fit: contain; }
 
+        #svg-bg { transition: fill 0.3s ease; }
         .editor-content {
             width: 100%; height: 100%; outline: none; word-break: keep-all; white-space: pre-wrap;
             font-family: 'Nanum Myeongjo', serif; font-size: 18px; color: #27272a; overflow: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
         }
+        .editor-content span { transition: color 0.3s ease, background-color 0.3s ease; }
         .editor-content:empty:before { content: "여기에 발췌할 소설 내용을 입력하세요..."; color: #a1a1aa; }
 
-        /* 사이드바 너비 320px로 확대 */
         .sidebar {
             width: 320px;
             background-color: var(--bg-toolbar);
@@ -187,7 +198,6 @@
         input:checked + .slider { background-color: var(--point-purple); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        /* 모드 선택 탭 버튼 디자인 */
         .tab-group { display: flex; width: 100%; margin-bottom: 12px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); }
         .tab-btn { flex: 1; padding: 6px 0; background: #f8f8f8; border: none; font-size: 12px; cursor: pointer; color: var(--text-muted); font-weight: 600; }
         .tab-btn.active { background: var(--point-purple); color: white; }
@@ -199,6 +209,21 @@
 
         .pickr .pcr-button { border: 1px solid var(--border-color); border-radius: 4px; width: 22px; height: 22px; flex-shrink:0; }
         .pickr-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); }
+
+        .custom-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .custom-modal {
+            background: white; padding: 24px; border-radius: 12px; width: 320px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 16px;
+        }
+        .custom-modal h3 { font-size: 16px; color: var(--text-main); margin: 0; }
+        .custom-modal input { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; }
+        .custom-modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .custom-modal-btns button { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .btn-cancel { background: #f4f4f5; color: #52525b; }
+        .btn-submit { background: var(--point-purple); color: white; }
 
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
@@ -213,121 +238,118 @@
 </head>
 <body>
 
-<header>
-    <div class="header-left">
-        <h1>소설 발췌 편집기</h1>
+<div class="sticky-header">
+    <header>
+        <div class="header-left">
+            <h1>소설 발췌 편집기</h1>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="toolbar">
+        <div class="toolbar-row">
+            <div class="tool-group">
+                <button class="btn-sm" onclick="execCmd('undo')" title="실행 취소">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" style="display:none;"></path><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                </button>
+                <button class="btn-sm" onclick="execCmd('redo')" title="다시 실행">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                </button>
+                <button class="btn-sm" style="color: #ef4444;" onclick="clearAllContent()" title="전체 삭제">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+                <button class="btn-sm" style="color: #3b82f6;" onclick="pasteAndReplace()" title="내용 붙여넣기(교체)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                </button>
+            </div>
+
+            <div class="tool-group">
+                <select id="font-family-select" onchange="applyCustomStyle('fontFamily', this.value)">
+                    <option value="'Nanum Myeongjo', serif">나눔명조</option>
+                    <option value="'Noto Sans KR', sans-serif">본고딕</option>
+                    <option value="'Gowun Dodum', sans-serif">고운돋움</option>
+                </select>
+                <select id="font-size-select" onchange="applyCustomStyle('fontSize', this.value)">
+                    <option value="16">16px</option>
+                    <option value="18" selected>18px</option>
+                    <option value="24">24px</option>
+                    <option value="32">32px</option>
+                </select>
+            </div>
+
+            <div class="tool-group">
+                <button class="btn-sm" onclick="applyMarkdownHTML()" title="HTML/마크다운 렌더링 적용">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                </button>
+                <button class="btn-sm" onclick="openRegexModal()" title="정규식 치환">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="toolbar-row">
+            <div class="tool-group">
+                <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" title="굵게" style="font-weight:900; font-size:1.15em; width:32px; height:32px;">B</button>
+                <button onmousedown="event.preventDefault();" onclick="execCmd('italic')" title="기울임" style="font-style:italic; font-size:1.15em; width:32px; height:32px;">I</button>
+                <button onmousedown="event.preventDefault();" onclick="execCmd('underline')" title="밑줄" style="text-decoration:underline; font-size:1.15em; width:32px; height:32px;">U</button>
+                <button onmousedown="event.preventDefault();" onclick="execCmd('strikeThrough')" title="취소선" style="text-decoration:line-through; font-size:1.15em; width:32px; height:32px;">S</button>
+                
+                <button class="btn-sm" onmousedown="event.preventDefault();" onclick="applyBlur()" title="스포일러 (블러)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                </button>
+                <button class="btn-sm" onmousedown="event.preventDefault();" onclick="clearFormatCustom()" title="서식 지우기 (블러 해제 포함)" style="color:#ef4444;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3L3 21M21 21L3 3M14 6l-2-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"></path></svg>
+                </button>
+            </div>
+            
+            <div class="tool-group">
+                <button onmousedown="event.preventDefault();" onclick="execCmd('justifyLeft')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="15" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                <button onmousedown="event.preventDefault();" onclick="execCmd('justifyCenter')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                <button onmousedown="event.preventDefault();" onclick="execCmd('justifyRight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="9" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                <button onmousedown="event.preventDefault();" onclick="execCmd('justifyFull')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            </div>
+            
+            <div class="tool-group">
+                <div class="color-picker-wrapper">
+                    <button class="color-preset-btn" style="background-color: #27272a;" onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#27272a')"></button>
+                    <button class="color-preset-btn" style="background-color: #8B5CF6;" onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#8B5CF6')"></button>
+                    <button class="color-preset-btn" style="background-color: #2DD4BF;" onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#2DD4BF')"></button>
+                    <div id="picker-text"></div>
+                </div>
+            </div>
+
+            <div class="tool-group">
+                <div class="pickr-label">
+                    <button onmousedown="event.preventDefault();" style="cursor:default; pointer-events:none; border:none; padding:0; background:transparent;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                    </button>
+                    <button class="color-preset-btn" style="background-color: #fef08a;" onmousedown="event.preventDefault();" onclick="execCmd('backColor', '#fef08a')"></button>
+                    <button class="color-preset-btn" style="background-color: #a7f3d0;" onmousedown="event.preventDefault();" onclick="execCmd('backColor', '#a7f3d0')"></button>
+                    <div id="picker-highlight"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-        <button class="mobile-menu-btn" onclick="toggleSidebar()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-    </div>
-</header>
+</div>
 
 <div class="main-layout">
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <div class="editor-section">
-        <div class="toolbar">
-            <div class="toolbar-row">
-                <div class="tool-group">
-                    <button class="btn-sm" onclick="execCmd('undo')" title="실행 취소">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" style="display:none;"></path><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                    </button>
-                    <button class="btn-sm" onclick="execCmd('redo')" title="다시 실행">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                    </button>
-                    <button class="btn-sm" style="color: #ef4444;" onclick="clearAllContent()" title="전체 삭제">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                    <button class="btn-sm" style="color: #3b82f6;" onclick="pasteAndReplace()" title="내용 붙여넣기(교체)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                    </button>
-                </div>
-
-                <div class="tool-group">
-                    <select id="font-family-select" onchange="execCmd('fontName', this.value)">
-                        <option value="'Nanum Myeongjo', serif">나눔명조</option>
-                        <option value="'Noto Sans KR', sans-serif">본고딕</option>
-                        <option value="'Gowun Dodum', sans-serif">고운돋움</option>
-                    </select>
-                    <select id="font-size-select" onchange="execCmd('fontSize', this.value)">
-                        <option value="3">16px</option>
-                        <option value="4">18px</option>
-                        <option value="5">24px</option>
-                        <option value="6">32px</option>
-                    </select>
-                </div>
-
-                <div class="tool-group">
-                    <button class="btn-sm" onclick="applyMarkdownHTML()" title="HTML/마크다운 렌더링 적용">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                    </button>
-                    <button class="btn-sm" onclick="applyRegex()" title="정규식 치환">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="toolbar-row">
-                <div class="tool-group">
-                    <!-- 아이콘 크기를 1.15em 및 32px로 조정 (이전 1.25em/34px에서 축소) -->
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('bold')" title="굵게" style="font-weight:900; font-size:1.15em; width:32px; height:32px;">B</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('italic')" title="기울임" style="font-style:italic; font-size:1.15em; width:32px; height:32px;">I</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('underline')" title="밑줄" style="text-decoration:underline; font-size:1.15em; width:32px; height:32px;">U</button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('strikeThrough')" title="취소선" style="text-decoration:line-through; font-size:1.15em; width:32px; height:32px;">S</button>
-                    
-                    <button class="btn-sm" onmousedown="event.preventDefault();" onclick="applyBlur()" title="스포일러 (블러)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                    </button>
-                    <button class="btn-sm" onmousedown="event.preventDefault();" onclick="clearFormatCustom()" title="서식 지우기 (블러 해제 포함)" style="color:#ef4444;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3L3 21M21 21L3 3M14 6l-2-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4"></path></svg>
-                    </button>
-                </div>
-                
-                <div class="tool-group">
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('justifyLeft')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="15" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('justifyCenter')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('justifyRight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="9" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
-                    <button onmousedown="event.preventDefault();" onclick="execCmd('justifyFull')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
-                </div>
-                
-                <div class="tool-group">
-                    <div class="color-picker-wrapper">
-                        <button class="color-preset-btn" style="background-color: #27272a;" onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#27272a')"></button>
-                        <button class="color-preset-btn" style="background-color: #8B5CF6;" onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#8B5CF6')"></button>
-                        <button class="color-preset-btn" style="background-color: #2DD4BF;" onmousedown="event.preventDefault();" onclick="execCmd('foreColor', '#2DD4BF')"></button>
-                        <div id="picker-text"></div>
-                    </div>
-                </div>
-
-                <div class="tool-group">
-                    <div class="pickr-label">
-                        <button onmousedown="event.preventDefault();" style="cursor:default; pointer-events:none; border:none; padding:0; background:transparent;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
-                        </button>
-                        <button class="color-preset-btn" style="background-color: #fef08a;" onmousedown="event.preventDefault();" onclick="execCmd('backColor', '#fef08a')"></button>
-                        <button class="color-preset-btn" style="background-color: #a7f3d0;" onmousedown="event.preventDefault();" onclick="execCmd('backColor', '#a7f3d0')"></button>
-                        <div id="picker-highlight"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="workspace">
             <div id="svg-container">
                 <svg id="excerpt-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" width="500" height="700">
                     <defs>
-                        <style>
-                            @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Gowun+Dodum&display=swap');
-                        </style>
                         <filter id="paper-texture">
                             <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
                             <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.06 0" in="noise" result="coloredNoise" />
                             <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply" />
                         </filter>
                         
-                        <!-- 고정 그라데이션 프리셋 -->
                         <linearGradient id="grad-warm" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#fdfbf7" /><stop offset="100%" stop-color="#f3e8ff" />
                         </linearGradient>
@@ -338,7 +360,6 @@
                             <stop offset="0%" stop-color="#27272a" /><stop offset="100%" stop-color="#1e1b4b" />
                         </linearGradient>
 
-                        <!-- 사용자 지정 커스텀 그라데이션 적용 태그 -->
                         <linearGradient id="custom-grad" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop id="custom-grad-start" offset="0%" stop-color="#ffffff" />
                             <stop id="custom-grad-end" offset="100%" stop-color="#cccccc" />
@@ -355,7 +376,6 @@
         </div>
     </div>
     
-    <!-- 재편성된 사이드바 -->
     <aside class="sidebar" id="sidebar">
         <!-- 1. 텍스트 설정 -->
         <div class="sidebar-section">
@@ -388,7 +408,7 @@
             </div>
         </div>
 
-        <!-- 2. 배경 및 글씨색 (전체 적용) -->
+        <!-- 2. 배경 및 글씨색 -->
         <div class="sidebar-section">
             <h3>전체 색상 및 배경</h3>
             <div class="setting-row" style="margin-bottom: 16px;">
@@ -402,13 +422,11 @@
                 </div>
             </div>
 
-            <!-- 배경 모드 탭 추가 -->
             <div class="tab-group">
                 <button class="tab-btn active" id="tab-solid" onclick="toggleBgMode('solid')">단색 배경</button>
                 <button class="tab-btn" id="tab-gradient" onclick="toggleBgMode('gradient')">그라데이션</button>
             </div>
 
-            <!-- 단색 배경 패널 -->
             <div id="panel-solid">
                 <div class="setting-row" style="margin-bottom: 12px;">
                     <span>배경 색상</span>
@@ -422,7 +440,6 @@
                 </div>
             </div>
 
-            <!-- 그라데이션 배경 패널 (신규 구조 적용) -->
             <div id="panel-gradient" style="display: none;">
                 <div class="setting-row" style="margin-bottom: 8px;">
                     <span>프리셋 선택</span>
@@ -454,7 +471,6 @@
                 </div>
             </div>
 
-            <!-- 종이 텍스처 토글 -->
             <div class="setting-row" style="margin-top:12px; border-top:1px dashed var(--border-color); padding-top:12px;">
                 <span>종이 질감 텍스처</span>
                 <label class="toggle-switch">
@@ -523,10 +539,25 @@
             <p style="font-size: 11px; color: #999; margin-top: 6px; line-height: 1.4;">입력한 글이 설정한 크기를 넘어가면 캔버스가 자동으로 여러 장으로 나뉘어 일괄 저장됩니다.</p>
         </div>
 
-        <button class="btn-primary" onclick="startDownload()" style="padding: 12px;">일괄 캡처 및 이미지 저장</button>
+        <button class="btn-primary" id="start-download-btn" onclick="startDownload()" style="padding: 12px;">일괄 캡처 및 이미지 저장</button>
     </aside>
 </div>
 
+<!-- 정규식 모달 -->
+<div id="custom-regex-modal" class="custom-modal-overlay">
+    <div class="custom-modal">
+        <h3>정규식 텍스트 치환</h3>
+        <input type="text" id="regex-pattern-input" placeholder="찾을 패턴 (예: [0-9]+)">
+        <input type="text" id="regex-replace-input" placeholder="바꿀 문자열">
+        <div class="custom-modal-btns">
+            <button class="btn-cancel" onclick="closeRegexModal()">취소</button>
+            <button class="btn-submit" onclick="executeRegexModal()">적용하기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 📌 웹폰트, CSS 파싱을 네이티브로 완벽 지원하는 캡처 라이브러리 도입 (dom-to-image-more) -->
+<script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/dist/dom-to-image-more.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 
 <script>
@@ -565,7 +596,25 @@
         editor.focus();
     }
 
-    /* 유틸리티(삭제/붙여넣기) 및 마크다운/정규식 기능 */
+    function applyCustomStyle(styleType, value) {
+        restoreSelection();
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0 && !sel.isCollapsed) {
+            const range = sel.getRangeAt(0);
+            const span = document.createElement('span');
+            if(styleType === 'fontFamily') span.style.fontFamily = value;
+            if(styleType === 'fontSize') span.style.fontSize = value + 'px';
+            
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+            sel.removeAllRanges();
+        } else {
+            if(styleType === 'fontFamily') editor.style.fontFamily = value;
+            if(styleType === 'fontSize') editor.style.fontSize = value + 'px';
+        }
+        editor.focus();
+    }
+
     function clearAllContent() {
         if(confirm("모든 내용을 삭제하시겠습니까?\n작업 중인 내용이 모두 사라집니다.")) {
             editor.innerHTML = '';
@@ -602,26 +651,36 @@
         editor.focus();
     }
 
-    function applyRegex() {
+    /* 정규식 커스텀 모달 */
+    const regexModal = document.getElementById('custom-regex-modal');
+    function openRegexModal() {
         restoreSelection();
-        const pattern = prompt("찾을 정규식 패턴을 입력하세요:");
+        regexModal.style.display = 'flex';
+    }
+    function closeRegexModal() {
+        regexModal.style.display = 'none';
+        editor.focus();
+    }
+    function executeRegexModal() {
+        const pattern = document.getElementById('regex-pattern-input').value;
+        const replacement = document.getElementById('regex-replace-input').value;
         if (!pattern) return;
-        const replacement = prompt("바꿀 문자열을 입력하세요:");
-        if (replacement === null) return;
+
         try {
             const regex = new RegExp(pattern, 'g');
             const sel = window.getSelection();
-            if(sel.rangeCount > 0 && !sel.isCollapsed) {
-                const range = sel.getRangeAt(0);
+            if(sel.rangeCount > 0 && !sel.isCollapsed && savedRange) {
+                const range = savedRange;
                 const container = document.createElement('div');
                 container.appendChild(range.cloneContents());
                 container.innerHTML = container.innerHTML.replace(regex, replacement);
+                restoreSelection();
                 document.execCommand('insertHTML', false, container.innerHTML);
             } else {
                 editor.innerHTML = editor.innerHTML.replace(regex, replacement);
             }
         } catch(e) { alert("잘못된 정규식 패턴입니다."); }
-        editor.focus();
+        closeRegexModal();
     }
 
     function clearFormatCustom() {
@@ -634,6 +693,8 @@
                 if(sel.containsNode(span, true)) {
                     span.style.filter = '';
                     span.style.backgroundColor = '';
+                    span.style.fontFamily = '';
+                    span.style.fontSize = '';
                 }
             });
         }
@@ -654,7 +715,6 @@
         editor.focus();
     }
 
-    /* --- Pickr 인스턴스 초기화 --- */
     const pickrOptions = {
         theme: 'nano',
         components: { preview: true, opacity: true, hue: true, interaction: { hex: true, input: true, save: true } }
@@ -674,17 +734,15 @@
     pickrGlobalText.on('save', (color) => { setGlobalTextColor(color.toHEXA().toString()); pickrGlobalText.hide(); });
     pickrGlobalText.on('change', (color) => { editor.style.color = color.toHEXA().toString(); });
 
-    /* --- 배경 설정 로직 (단색 / 그라데이션) --- */
-    // 단색 Pickr
     const pickrBg = Pickr.create({ el: '#picker-bg', default: '#ffffff', ...pickrOptions, strings: { save: '적용' }});
     function setBgColor(hexColor) {
         svgBg.setAttribute('fill', hexColor);
+        document.getElementById('bg-gradient').value = "none";
         pickrBg.setColor(hexColor);
     }
     pickrBg.on('save', (color) => { setBgColor(color.toHEXA().toString()); pickrBg.hide(); });
     pickrBg.on('change', (color) => { svgBg.setAttribute('fill', color.toHEXA().toString()); });
 
-    // 탭 전환 기능
     function toggleBgMode(mode) {
         document.getElementById('tab-solid').classList.remove('active');
         document.getElementById('tab-gradient').classList.remove('active');
@@ -694,15 +752,14 @@
         if (mode === 'solid') {
             document.getElementById('tab-solid').classList.add('active');
             document.getElementById('panel-solid').style.display = 'block';
-            svgBg.setAttribute('fill', pickrBg.getColor().toHEXA().toString()); // 마지막 단색 복구
+            svgBg.setAttribute('fill', pickrBg.getColor().toHEXA().toString());
         } else {
             document.getElementById('tab-gradient').classList.add('active');
             document.getElementById('panel-gradient').style.display = 'block';
-            applyBgGradientPreset(document.getElementById('bg-gradient').value); // 그라데이션 복구
+            applyBgGradientPreset(document.getElementById('bg-gradient').value);
         }
     }
 
-    // 그라데이션 커스텀 Pickr 초기화
     let customGradStart = '#ffffff';
     let customGradEnd = '#cccccc';
 
@@ -720,7 +777,6 @@
         updateCustomGradient(); 
     });
 
-    // 그라데이션 프리셋 적용
     function applyBgGradientPreset(val) {
         if (val === 'custom') {
             updateCustomGradient();
@@ -729,14 +785,12 @@
         }
     }
 
-    // 커스텀 그라데이션 값 SVG 동기화 및 렌더링
     function updateCustomGradient() {
         const direction = document.getElementById('grad-direction').value;
         const customGrad = document.getElementById('custom-grad');
         const startStop = document.getElementById('custom-grad-start');
         const endStop = document.getElementById('custom-grad-end');
 
-        // 방향 설정 (x1,y1 -> x2,y2)
         if(direction === 'top-bottom') {
             customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '0%'); customGrad.setAttribute('y2', '100%');
         } else if (direction === 'left-right') {
@@ -750,19 +804,16 @@
         startStop.setAttribute('stop-color', customGradStart);
         endStop.setAttribute('stop-color', customGradEnd);
 
-        // 현재 모드가 그라데이션이고, '사용자 지정' 상태일 때 렌더링 강제 적용
         if(document.getElementById('tab-gradient').classList.contains('active')) {
             document.getElementById('bg-gradient').value = 'custom';
             svgBg.setAttribute('fill', 'url(#custom-grad)');
         }
     }
 
-    // 텍스처 토글 (종이 질감)
     function applyBgTexture(isChecked) {
         svgBg.style.filter = isChecked ? 'url(#paper-texture)' : 'none';
     }
 
-    /* --- 텍스트 포맷 및 레이아웃 --- */
     function updateTextFormat() {
         const lsValue = document.getElementById('letter-space').value;
         const lhValue = document.getElementById('line-height').value;
@@ -818,52 +869,34 @@
         foreignObj.setAttribute('height', Math.max(10, h - pt - pb));
     }
 
-    /* --- 다운로드 로직 --- */
-    function renderAndDownload(svgClone, width, height, filename) {
-        return new Promise((resolve) => {
-            const svgData = new XMLSerializer().serializeToString(svgClone);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = width;
-            canvas.height = height;
-
-            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const img = new Image();
-
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-                URL.revokeObjectURL(url);
-                const downloadLink = document.createElement('a');
-                downloadLink.href = canvas.toDataURL('image/png');
-                downloadLink.download = filename;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-                setTimeout(resolve, 300);
-            };
-            img.src = url;
-        });
-    }
-
+    /* 📌 dom-to-image-more 라이브러리를 활용한 완벽한 클라이언트 렌더링 도입 */
     async function startDownload() {
         window.getSelection().removeAllRanges();
         editor.blur();
+
+        const btn = document.getElementById('start-download-btn');
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = "저장 중... (잠시 대기)";
+        btn.disabled = true;
 
         const baseW = parseInt(document.getElementById('canvas-w').value);
         const baseH = parseInt(document.getElementById('canvas-h').value);
         const pt = parseInt(document.getElementById('pad-t').value);
         const pb = parseInt(document.getElementById('pad-b').value);
-        const pl = parseInt(document.getElementById('pad-l').value);
-        const pr = parseInt(document.getElementById('pad-r').value);
         const isCropLast = document.getElementById('crop-last').checked;
 
         const contentAreaHeight = baseH - pt - pb;
 
-        const originalHeight = foreignObj.getAttribute('height');
+        // 원본 저장
+        const originalSvgHeight = svgElement.getAttribute('height');
+        const originalViewBox = svgElement.getAttribute('viewBox');
+        const originalForeignHeight = foreignObj.getAttribute('height');
+        const originalTransform = editor.style.transform;
+
+        // 실제 높이 계산
         foreignObj.setAttribute('height', '100000');
         const totalContentHeight = editor.scrollHeight;
-        foreignObj.setAttribute('height', originalHeight);
+        foreignObj.setAttribute('height', originalForeignHeight);
 
         let totalPages = Math.ceil(totalContentHeight / contentAreaHeight);
         if (totalPages === 0) totalPages = 1;
@@ -877,25 +910,51 @@
                 currentCanvasHeight = remainingHeight + pt + pb;
             }
 
-            const svgClone = svgElement.cloneNode(true);
-            svgClone.setAttribute('height', currentCanvasHeight);
-            svgClone.setAttribute('viewBox', `0 0 ${baseW} ${currentCanvasHeight}`);
-            
-            svgClone.querySelector('#svg-bg').setAttribute('height', '100%');
-            
-            const cloneForeign = svgClone.querySelector('foreignObject');
-            cloneForeign.setAttribute('height', currentCanvasHeight - pt - pb);
-            
-            const cloneEditor = svgClone.querySelector('.editor-content');
-            cloneEditor.style.marginTop = `${translateY}px`;
+            // 분할 렌더링을 위해 실제 DOM을 일시적으로 수정
+            svgElement.setAttribute('height', currentCanvasHeight);
+            svgElement.setAttribute('viewBox', `0 0 ${baseW} ${currentCanvasHeight}`);
+            foreignObj.setAttribute('height', currentCanvasHeight - pt - pb);
+            editor.style.transform = `translateY(${translateY}px)`;
 
-            let filename = totalPages > 1 ? `novel_excerpt_page_${i + 1}.png` : `novel_excerpt.png`;
-            await renderAndDownload(svgClone, baseW, currentCanvasHeight, filename);
+            // DOM 렌더링 반영을 위한 약간의 딜레이
+            await new Promise(r => setTimeout(r, 150));
+
+            try {
+                // dom-to-image-more를 사용하여 웹 폰트/CSS 파싱 완벽 지원 캡처
+                const dataUrl = await domtoimage.toPng(svgElement, {
+                    width: baseW,
+                    height: currentCanvasHeight,
+                    style: { transform: 'none', transformOrigin: 'top left' }
+                });
+
+                let filename = totalPages > 1 ? `novel_excerpt_page_${i + 1}.png` : `novel_excerpt.png`;
+                const downloadLink = document.createElement('a');
+                downloadLink.href = dataUrl;
+                downloadLink.download = filename;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                // 여러 장 다운로드 시 브라우저 차단 방지
+                await new Promise(r => setTimeout(r, 400));
+            } catch (e) {
+                console.error("Capture failed:", e);
+                alert("이미지 저장 중 오류가 발생했습니다. (외부 폰트/이미지 보안 제한일 수 있습니다.)");
+            }
         }
+
+        // DOM 원상 복구
+        svgElement.setAttribute('height', originalSvgHeight);
+        svgElement.setAttribute('viewBox', originalViewBox);
+        foreignObj.setAttribute('height', originalForeignHeight);
+        editor.style.transform = originalTransform || 'none';
+        
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
     }
     
-    // 초기 로딩 시 커스텀 그라데이션 동기화
     updateCustomGradient();
 </script>
 </body>
 </html>
+
