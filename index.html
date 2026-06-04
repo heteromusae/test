@@ -379,6 +379,7 @@
     </div>
     
     <aside class="sidebar" id="sidebar">
+        <!-- 1. 텍스트 설정 -->
         <div class="sidebar-section">
             <h3>텍스트 설정</h3>
             <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
@@ -409,6 +410,7 @@
             </div>
         </div>
 
+        <!-- 2. 배경 및 글씨색 -->
         <div class="sidebar-section">
             <h3>전체 색상 및 배경</h3>
             <div class="setting-row" style="margin-bottom: 16px;">
@@ -480,6 +482,7 @@
             </div>
         </div>
 
+        <!-- 3. 상하좌우 여백 -->
         <div class="sidebar-section">
             <h3 style="display:flex; justify-content:space-between; align-items:center;">
                 상하좌우 여백
@@ -513,6 +516,7 @@
             </div>
         </div>
 
+        <!-- 4. 문서 크기 및 저장 -->
         <div class="sidebar-section" style="border-bottom:none;">
             <h3>문서 크기 및 저장 옵션</h3>
             <select id="canvas-preset" onchange="applyCanvasPreset(this.value)" style="width:100%; padding: 6px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit;">
@@ -541,6 +545,7 @@
     </aside>
 </div>
 
+<!-- 정규식 모달 -->
 <div id="custom-regex-modal" class="custom-modal-overlay">
     <div class="custom-modal">
         <h3>정규식 텍스트 치환</h3>
@@ -553,6 +558,7 @@
     </div>
 </div>
 
+<!-- 미리보기 모달 -->
 <div id="preview-modal" class="custom-modal-overlay">
     <div class="custom-modal" style="width: 90%; max-width: 500px; max-height: 90vh; height: 100%; display: flex; flex-direction: column;">
         <h3 style="flex-shrink: 0; margin-bottom: 10px;">저장 미리보기</h3>
@@ -849,9 +855,10 @@
         editor.style.height = '100%'; 
     }
 
-    /* 📌 1. 버그 수정: 세로(Y축) 분할 방식으로 복구하여 다단 레이아웃이 텍스트 줄바꿈을 부자연스럽게 망가뜨리는 현상 제거 */
-    /* 📌 2. 버그 수정: 캡처 시 에디터 컨테이너 높이를 100%가 아닌 '측정된 실제 텍스트 높이(pureTotalHeight)'로 고정하여 두 번째 장 이후로 텍스트가 잘려 빈 화면이 나오는 현상 완벽 방어 */
-    /* 📌 3. 버그 수정: 무식하게 픽셀 단위로 당겨서 글자 중간이 잘리는 현상을 막기 위해, 실제 텍스트의 줄 높이(line-height) 배수에 맞춰서만 분할 이동하도록 보정 */
+    /* 📌 1. 버그 수정: 세로(Y축) 분할 방식으로 복구하여 다단 레이아웃 텍스트 깨짐 제거 */
+    /* 📌 2. 버그 수정: 캡처 시 에디터 컨테이너 높이를 100%가 아닌 '실제 텍스트 높이'로 고정하여 두 번째 장 이후 빈 화면 방어 */
+    /* 📌 3. 버그 수정: 줄 높이(line-height) 배수에 맞춰서 분할 이동하여 글자 중간 잘림 원천 차단 */
+    /* 📌 4. 버그 수정(NEW): 이미지 추출 시 스케일 팩터(3배)를 적용하여 화질 깨짐을 막고 초고해상도로 렌더링되게 개선 */
     async function showPreview() {
         window.getSelection().removeAllRanges();
         editor.blur();
@@ -872,7 +879,7 @@
         const contentAreaW = baseW - pl - pr;
         const rawContentAreaH = baseH - pt - pb;
 
-        // 원상 복구를 위한 현재 에디터 상태 백업
+        // 원상 복구를 위한 백업
         const origSvgH = svgElement.getAttribute('height');
         const origViewBox = svgElement.getAttribute('viewBox');
         const origForeignW = foreignObj.getAttribute('width');
@@ -880,7 +887,6 @@
         const origTransform = editor.style.transform;
         const origHeight = editor.style.height;
 
-        // [핵심 해결 로직] 브라우저에 렌더링된 텍스트의 실제 줄 높이를 정확히 파악
         const computedStyle = window.getComputedStyle(editor);
         let lineHeightPx = parseFloat(computedStyle.lineHeight);
         if (isNaN(lineHeightPx)) {
@@ -889,11 +895,9 @@
             lineHeightPx = fontSize * lineSpacing;
         }
 
-        // 분할 영역의 높이를 무조건 줄 높이의 배수로 딱 떨어지게 내림(floor)하여 글자 중간 잘림 원천 차단
         let safeContentAreaH = Math.floor(rawContentAreaH / lineHeightPx) * lineHeightPx;
         if (safeContentAreaH <= 0) safeContentAreaH = lineHeightPx;
 
-        // 문서의 순수 전체 높이를 1회 정확하게 측정
         editor.style.height = 'auto';
         const pureTotalHeight = editor.scrollHeight;
 
@@ -904,42 +908,45 @@
         const previewContainer = document.getElementById('preview-images-container');
         previewContainer.innerHTML = '';
 
+        // [핵심] 고해상도 화질 펌핑 (3배수 적용)
+        const scale = 3;
+
         for (let i = 0; i < totalPages; i++) {
-            let currentCanvasHeight = baseH; // 사용자가 설정한 원본 캔버스 높이 유지
+            let currentCanvasHeight = baseH; 
             let currentForeignH = safeContentAreaH;
 
-            // 마지막 페이지 자르기 기능
             if (i === totalPages - 1 && isCropLast) {
                 const remainingContentH = pureTotalHeight - (i * safeContentAreaH);
                 if (remainingContentH > 0 && remainingContentH < safeContentAreaH) {
-                    currentForeignH = remainingContentH + 10; // 글자 밑동 잘림 방지 안전 여백 10px 추가
+                    currentForeignH = remainingContentH + 10; 
                     currentCanvasHeight = currentForeignH + pt + pb;
                 } else if (remainingContentH <= 0 && totalPages > 1) {
-                    continue; // 텍스트가 남지 않은 빈 페이지는 캡처 무시
+                    continue; 
                 }
             }
 
-            // 캔버스 크기 조정
             svgElement.setAttribute('height', currentCanvasHeight);
             svgElement.setAttribute('viewBox', `0 0 ${baseW} ${currentCanvasHeight}`);
             
-            // 페이지 영역과 동일하게 설정 (상하좌우 여백 유지)
             foreignObj.setAttribute('width', contentAreaW);
             foreignObj.setAttribute('height', currentForeignH); 
 
-            // 높이를 100%가 아닌 '실제 텍스트 높이'로 고정
             editor.style.height = pureTotalHeight + 'px';
             
-            // 무식한 픽셀 단위가 아닌 "줄 간격이 온전히 보장된 단위"로만 텍스트를 위로 당겨오기
             let translateY = -(i * safeContentAreaH);
             editor.style.transform = `translateY(${translateY}px)`;
 
             await new Promise(r => setTimeout(r, 150)); 
 
             try {
+                // 스케일 변수 적용 (원본 캔버스 픽셀을 강제로 3배 부풀려 렌더링)
                 const dataUrl = await domtoimage.toPng(svgElement, {
-                    width: baseW, height: currentCanvasHeight,
-                    style: { transform: 'none', transformOrigin: 'top left' }
+                    width: baseW * scale, 
+                    height: currentCanvasHeight * scale,
+                    style: { 
+                        transform: `scale(${scale})`, 
+                        transformOrigin: 'top left' 
+                    }
                 });
                 
                 generatedImages.push(dataUrl);
@@ -959,7 +966,7 @@
             }
         }
 
-        // 캡처 종료 후 DOM을 원래 무한 캔버스 상태로 복원
+        // DOM 상태 복구
         svgElement.setAttribute('height', origSvgH);
         svgElement.setAttribute('viewBox', origViewBox);
         foreignObj.setAttribute('width', origForeignW);
