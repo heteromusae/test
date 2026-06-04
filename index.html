@@ -147,7 +147,7 @@
         }
 
         .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .editor-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .editor-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; }
         
         .workspace { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow: auto; }
 
@@ -227,6 +227,39 @@
         .btn-submit:hover { background: var(--point-purple-hover); }
         .btn-submit:disabled { background: #a1a1aa; cursor: not-allowed; }
 
+        /* 📌 편집기 줌 컨트롤 CSS */
+        .zoom-controls {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+        }
+        .zoom-controls button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            border-radius: 4px;
+            transition: background 0.1s;
+        }
+        .zoom-controls button:hover { background: #e4e4e7; }
+        .zoom-controls button svg { width: 16px; height: 16px; }
+        .zoom-controls span { font-size: 13px; font-weight: 700; min-width: 44px; text-align: center; color: var(--text-main); }
+
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
             .sidebar { position: absolute; right: -320px; top: 0; height: 100%; z-index: 100; }
@@ -235,6 +268,7 @@
             header h1 { font-size: 16px; }
             .toolbar { padding: 8px 12px; }
             .tool-group { padding-right: 8px; gap: 2px; }
+            .zoom-controls { bottom: 16px; right: 16px; }
         }
     </style>
 </head>
@@ -376,10 +410,19 @@
                 </svg>
             </div>
         </div>
+        
+        <div class="zoom-controls">
+            <button onclick="setZoom(zoomLevel - 0.1)" title="축소">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <span id="zoom-val">100%</span>
+            <button onclick="setZoom(zoomLevel + 0.1)" title="확대">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
     </div>
     
     <aside class="sidebar" id="sidebar">
-        <!-- 1. 텍스트 설정 -->
         <div class="sidebar-section">
             <h3>텍스트 설정</h3>
             <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
@@ -410,7 +453,6 @@
             </div>
         </div>
 
-        <!-- 2. 배경 및 글씨색 -->
         <div class="sidebar-section">
             <h3>전체 색상 및 배경</h3>
             <div class="setting-row" style="margin-bottom: 16px;">
@@ -482,7 +524,6 @@
             </div>
         </div>
 
-        <!-- 3. 상하좌우 여백 -->
         <div class="sidebar-section">
             <h3 style="display:flex; justify-content:space-between; align-items:center;">
                 상하좌우 여백
@@ -516,7 +557,6 @@
             </div>
         </div>
 
-        <!-- 4. 문서 크기 및 저장 -->
         <div class="sidebar-section" style="border-bottom:none;">
             <h3>문서 크기 및 저장 옵션</h3>
             <select id="canvas-preset" onchange="applyCanvasPreset(this.value)" style="width:100%; padding: 6px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit;">
@@ -545,7 +585,6 @@
     </aside>
 </div>
 
-<!-- 정규식 모달 -->
 <div id="custom-regex-modal" class="custom-modal-overlay">
     <div class="custom-modal">
         <h3>정규식 텍스트 치환</h3>
@@ -558,7 +597,6 @@
     </div>
 </div>
 
-<!-- 미리보기 모달 -->
 <div id="preview-modal" class="custom-modal-overlay">
     <div class="custom-modal" style="width: 90%; max-width: 500px; max-height: 90vh; height: 100%; display: flex; flex-direction: column;">
         <h3 style="flex-shrink: 0; margin-bottom: 10px;">저장 미리보기</h3>
@@ -581,6 +619,23 @@
     const svgBg = document.getElementById('svg-bg');
     let generatedImages = [];
     
+    // 📌 편집기 시각적 줌(Zoom) 관련 로직 추가
+    let zoomLevel = 1;
+    function setZoom(level) {
+        zoomLevel = Math.max(0.2, Math.min(level, 3)); // 20% ~ 300% 제한
+        document.getElementById('zoom-val').textContent = Math.round(zoomLevel * 100) + '%';
+        const container = document.getElementById('svg-container');
+        
+        // CSS zoom 속성을 최우선으로 사용하여 스크롤바 영역까지 완벽히 조절
+        container.style.zoom = zoomLevel;
+        
+        // zoom 속성을 미지원하는 구형 브라우저를 위한 폴백
+        if (!('zoom' in container.style)) {
+            container.style.transform = `scale(${zoomLevel})`;
+            container.style.transformOrigin = 'top center';
+        }
+    }
+
     editor.addEventListener('input', updateLayout);
 
     function toggleSidebar() {
@@ -855,161 +910,11 @@
         editor.style.height = '100%'; 
     }
 
-    /* 📌 1. 버그 수정: 세로(Y축) 분할 방식으로 복구하여 다단 레이아웃 텍스트 깨짐 제거 */
-    /* 📌 2. 버그 수정: 캡처 시 에디터 컨테이너 높이를 100%가 아닌 '실제 텍스트 높이'로 고정하여 두 번째 장 이후 빈 화면 방어 */
-    /* 📌 3. 버그 수정: 줄 높이(line-height) 배수에 맞춰서 분할 이동하여 글자 중간 잘림 원천 차단 */
-    /* 📌 4. 버그 수정(NEW): 이미지 추출 시 스케일 팩터(3배)를 적용하여 화질 깨짐을 막고 초고해상도로 렌더링되게 개선 */
+    /* 📌 화질 개선 핵심 수정: 라이브러리 내장 옵션(scale)을 사용해 CSS 붕괴 없이 고해상도 추출 */
     async function showPreview() {
         window.getSelection().removeAllRanges();
         editor.blur();
 
         const btn = document.getElementById('start-download-btn');
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = "미리보기 렌더링 중...";
-        btn.disabled = true;
-
-        const baseW = parseInt(document.getElementById('canvas-w').value);
-        const baseH = parseInt(document.getElementById('canvas-h').value);
-        const pt = parseInt(document.getElementById('pad-t').value);
-        const pb = parseInt(document.getElementById('pad-b').value);
-        const pl = parseInt(document.getElementById('pad-l').value);
-        const pr = parseInt(document.getElementById('pad-r').value);
-        const isCropLast = document.getElementById('crop-last').checked;
-
-        const contentAreaW = baseW - pl - pr;
-        const rawContentAreaH = baseH - pt - pb;
-
-        // 원상 복구를 위한 백업
-        const origSvgH = svgElement.getAttribute('height');
-        const origViewBox = svgElement.getAttribute('viewBox');
-        const origForeignW = foreignObj.getAttribute('width');
-        const origForeignH = foreignObj.getAttribute('height');
-        const origTransform = editor.style.transform;
-        const origHeight = editor.style.height;
-
-        const computedStyle = window.getComputedStyle(editor);
-        let lineHeightPx = parseFloat(computedStyle.lineHeight);
-        if (isNaN(lineHeightPx)) {
-            const fontSize = parseFloat(computedStyle.fontSize);
-            const lineSpacing = parseFloat(document.getElementById('line-height').value) || 1.8;
-            lineHeightPx = fontSize * lineSpacing;
-        }
-
-        let safeContentAreaH = Math.floor(rawContentAreaH / lineHeightPx) * lineHeightPx;
-        if (safeContentAreaH <= 0) safeContentAreaH = lineHeightPx;
-
-        editor.style.height = 'auto';
-        const pureTotalHeight = editor.scrollHeight;
-
-        let totalPages = Math.ceil(pureTotalHeight / safeContentAreaH);
-        if (totalPages <= 0 || editor.innerText.trim() === '') totalPages = 1;
-
-        generatedImages = [];
-        const previewContainer = document.getElementById('preview-images-container');
-        previewContainer.innerHTML = '';
-
-        // [핵심] 고해상도 화질 펌핑 (3배수 적용)
-        const scale = 3;
-
-        for (let i = 0; i < totalPages; i++) {
-            let currentCanvasHeight = baseH; 
-            let currentForeignH = safeContentAreaH;
-
-            if (i === totalPages - 1 && isCropLast) {
-                const remainingContentH = pureTotalHeight - (i * safeContentAreaH);
-                if (remainingContentH > 0 && remainingContentH < safeContentAreaH) {
-                    currentForeignH = remainingContentH + 10; 
-                    currentCanvasHeight = currentForeignH + pt + pb;
-                } else if (remainingContentH <= 0 && totalPages > 1) {
-                    continue; 
-                }
-            }
-
-            svgElement.setAttribute('height', currentCanvasHeight);
-            svgElement.setAttribute('viewBox', `0 0 ${baseW} ${currentCanvasHeight}`);
-            
-            foreignObj.setAttribute('width', contentAreaW);
-            foreignObj.setAttribute('height', currentForeignH); 
-
-            editor.style.height = pureTotalHeight + 'px';
-            
-            let translateY = -(i * safeContentAreaH);
-            editor.style.transform = `translateY(${translateY}px)`;
-
-            await new Promise(r => setTimeout(r, 150)); 
-
-            try {
-                // 스케일 변수 적용 (원본 캔버스 픽셀을 강제로 3배 부풀려 렌더링)
-                const dataUrl = await domtoimage.toPng(svgElement, {
-                    width: baseW * scale, 
-                    height: currentCanvasHeight * scale,
-                    style: { 
-                        transform: `scale(${scale})`, 
-                        transformOrigin: 'top left' 
-                    }
-                });
-                
-                generatedImages.push(dataUrl);
-
-                const imgEl = document.createElement('img');
-                imgEl.src = dataUrl;
-                imgEl.style.maxWidth = '100%';
-                imgEl.style.height = 'auto';
-                imgEl.style.marginBottom = '12px';
-                imgEl.style.border = '1px solid #e4e4e7';
-                imgEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                previewContainer.appendChild(imgEl);
-            } catch (e) {
-                console.error("Capture failed:", e);
-                alert("미리보기 렌더링 중 오류가 발생했습니다.");
-                break;
-            }
-        }
-
-        // DOM 상태 복구
-        svgElement.setAttribute('height', origSvgH);
-        svgElement.setAttribute('viewBox', origViewBox);
-        foreignObj.setAttribute('width', origForeignW);
-        foreignObj.setAttribute('height', origForeignH);
-        editor.style.transform = origTransform || 'none';
-        editor.style.height = origHeight || '100%';
-
-        updateLayout(); 
-        
-        btn.innerHTML = originalBtnText;
-        btn.disabled = false;
-
-        if (generatedImages.length > 0) {
-            document.getElementById('preview-modal').style.display = 'flex';
-            document.getElementById('download-confirm-btn').innerText = `저장하기 (${generatedImages.length}장)`;
-        }
-    }
-
-    function closePreview() { document.getElementById('preview-modal').style.display = 'none'; }
-
-    async function downloadGeneratedImages() {
-        const btn = document.getElementById('download-confirm-btn');
-        btn.innerText = "저장 진행 중...";
-        btn.disabled = true;
-
-        for (let i = 0; i < generatedImages.length; i++) {
-            let filename = generatedImages.length > 1 ? `novel_excerpt_page_${i + 1}.png` : `novel_excerpt.png`;
-            const downloadLink = document.createElement('a');
-            downloadLink.href = generatedImages[i];
-            downloadLink.download = filename;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-            await new Promise(r => setTimeout(r, 400));
-        }
-
-        btn.innerText = `저장하기 (${generatedImages.length}장)`;
-        btn.disabled = false;
-        closePreview();
-    }
-    
-    updateCustomGradient();
-    updateLayout();
-</script>
-</body>
-</html>
+        btn.innerHTML = "미리
