@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>소설 발췌 편집기</title>
-    <!-- 웹 폰트 (dom-to-image-more가 이 리소스를 추적하여 이미지 내부에 Base64로 자동 내장시킴) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -151,24 +149,25 @@
         .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
         .editor-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         
-        .workspace { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: auto; }
+        .workspace { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow: auto; }
 
         #svg-container {
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             background: white;
             max-width: 100%;
-            max-height: calc(100vh - 160px);
-            aspect-ratio: auto; 
+            height: auto; 
             display: flex;
+            transition: width 0.3s ease;
         }
 
-        svg { display: block; width: 100%; height: 100%; object-fit: contain; }
+        svg { display: block; width: 100%; height: auto; }
 
         #svg-bg { transition: fill 0.3s ease; }
         .editor-content {
             width: 100%; height: 100%; outline: none; word-break: keep-all; white-space: pre-wrap;
             font-family: 'Nanum Myeongjo', serif; font-size: 18px; color: #27272a; overflow: hidden;
             transition: color 0.3s ease, background-color 0.3s ease;
+            margin: 0; padding: 0;
         }
         .editor-content span { transition: color 0.3s ease, background-color 0.3s ease; }
         .editor-content:empty:before { content: "여기에 발췌할 소설 내용을 입력하세요..."; color: #a1a1aa; }
@@ -222,8 +221,11 @@
         .custom-modal input { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; }
         .custom-modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
         .custom-modal-btns button { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
-        .btn-cancel { background: #f4f4f5; color: #52525b; }
-        .btn-submit { background: var(--point-purple); color: white; }
+        .btn-cancel { background: #f4f4f5; color: #52525b; transition: background-color 0.2s; }
+        .btn-cancel:hover { background: #e4e4e7; }
+        .btn-submit { background: var(--point-purple); color: white; transition: background-color 0.2s; }
+        .btn-submit:hover { background: var(--point-purple-hover); }
+        .btn-submit:disabled { background: #a1a1aa; cursor: not-allowed; }
 
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
@@ -377,7 +379,6 @@
     </div>
     
     <aside class="sidebar" id="sidebar">
-        <!-- 1. 텍스트 설정 -->
         <div class="sidebar-section">
             <h3>텍스트 설정</h3>
             <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
@@ -408,7 +409,6 @@
             </div>
         </div>
 
-        <!-- 2. 배경 및 글씨색 -->
         <div class="sidebar-section">
             <h3>전체 색상 및 배경</h3>
             <div class="setting-row" style="margin-bottom: 16px;">
@@ -480,7 +480,6 @@
             </div>
         </div>
 
-        <!-- 3. 상하좌우 여백 -->
         <div class="sidebar-section">
             <h3 style="display:flex; justify-content:space-between; align-items:center;">
                 상하좌우 여백
@@ -514,7 +513,6 @@
             </div>
         </div>
 
-        <!-- 4. 문서 크기 및 저장 -->
         <div class="sidebar-section" style="border-bottom:none;">
             <h3>문서 크기 및 저장 옵션</h3>
             <select id="canvas-preset" onchange="applyCanvasPreset(this.value)" style="width:100%; padding: 6px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit;">
@@ -536,14 +534,13 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <p style="font-size: 11px; color: #999; margin-top: 6px; line-height: 1.4;">입력한 글이 설정한 크기를 넘어가면 캔버스가 자동으로 여러 장으로 나뉘어 일괄 저장됩니다.</p>
+            <p style="font-size: 11px; color: #999; margin-top: 6px; line-height: 1.4;">입력한 글이 설정한 크기를 넘어가면 캔버스가 여러 장으로 나뉘어 저장됩니다.</p>
         </div>
 
-        <button class="btn-primary" id="start-download-btn" onclick="startDownload()" style="padding: 12px;">일괄 캡처 및 이미지 저장</button>
+        <button class="btn-primary" id="start-download-btn" onclick="showPreview()" style="padding: 12px;">캡처 및 미리보기</button>
     </aside>
 </div>
 
-<!-- 정규식 모달 -->
 <div id="custom-regex-modal" class="custom-modal-overlay">
     <div class="custom-modal">
         <h3>정규식 텍스트 치환</h3>
@@ -556,7 +553,18 @@
     </div>
 </div>
 
-<!-- 📌 웹폰트, CSS 파싱을 네이티브로 완벽 지원하는 캡처 라이브러리 도입 (dom-to-image-more) -->
+<div id="preview-modal" class="custom-modal-overlay">
+    <div class="custom-modal" style="width: 90%; max-width: 500px; max-height: 90vh; height: 100%; display: flex; flex-direction: column;">
+        <h3 style="flex-shrink: 0; margin-bottom: 10px;">저장 미리보기</h3>
+        <div id="preview-images-container" style="flex: 1; overflow-y: auto; background: var(--bg-body); padding: 16px; border-radius: 6px; text-align: center;">
+        </div>
+        <div class="custom-modal-btns" style="flex-shrink: 0; margin-top: 16px;">
+            <button class="btn-cancel" onclick="closePreview()">취소</button>
+            <button id="download-confirm-btn" class="btn-submit" onclick="downloadGeneratedImages()">저장하기</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/dist/dom-to-image-more.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 
@@ -565,7 +573,10 @@
     const svgElement = document.getElementById('excerpt-svg');
     const foreignObj = document.getElementById('foreign-obj');
     const svgBg = document.getElementById('svg-bg');
+    let generatedImages = [];
     
+    editor.addEventListener('input', updateLayout);
+
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebar-overlay').classList.toggle('active');
@@ -618,6 +629,7 @@
     function clearAllContent() {
         if(confirm("모든 내용을 삭제하시겠습니까?\n작업 중인 내용이 모두 사라집니다.")) {
             editor.innerHTML = '';
+            updateLayout();
             editor.focus();
         }
     }
@@ -626,10 +638,11 @@
         if(!confirm("현재 내용을 모두 지우고 클립보드 내용을 붙여넣으시겠습니까?")) return;
         try {
             const text = await navigator.clipboard.readText();
-            if(text !== undefined) editor.innerText = text;
-        } catch (err) {
-            alert("클립보드 접근 권한이 없거나 지원하지 않는 브라우저입니다.");
-        }
+            if(text !== undefined) {
+                editor.innerText = text;
+                updateLayout();
+            }
+        } catch (err) { alert("클립보드 접근 권한이 없거나 지원하지 않는 브라우저입니다."); }
         editor.focus();
     }
 
@@ -645,27 +658,18 @@
                 .replace(/__(.*?)__/g, '<u>$1</u>')
                 .replace(/~~(.*?)~~/g, '<strike>$1</strike>');
             document.execCommand('insertHTML', false, parsed);
-        } else {
-            alert("적용할 텍스트(마크다운 포함)를 먼저 드래그하여 선택해주세요.");
-        }
+        } else { alert("적용할 텍스트(마크다운 포함)를 먼저 드래그하여 선택해주세요."); }
         editor.focus();
     }
 
-    /* 정규식 커스텀 모달 */
     const regexModal = document.getElementById('custom-regex-modal');
-    function openRegexModal() {
-        restoreSelection();
-        regexModal.style.display = 'flex';
-    }
-    function closeRegexModal() {
-        regexModal.style.display = 'none';
-        editor.focus();
-    }
+    function openRegexModal() { restoreSelection(); regexModal.style.display = 'flex'; }
+    function closeRegexModal() { regexModal.style.display = 'none'; editor.focus(); }
+    
     function executeRegexModal() {
         const pattern = document.getElementById('regex-pattern-input').value;
         const replacement = document.getElementById('regex-replace-input').value;
         if (!pattern) return;
-
         try {
             const regex = new RegExp(pattern, 'g');
             const sel = window.getSelection();
@@ -679,6 +683,7 @@
             } else {
                 editor.innerHTML = editor.innerHTML.replace(regex, replacement);
             }
+            updateLayout();
         } catch(e) { alert("잘못된 정규식 패턴입니다."); }
         closeRegexModal();
     }
@@ -691,10 +696,8 @@
             const spans = editor.querySelectorAll('span');
             spans.forEach(span => {
                 if(sel.containsNode(span, true)) {
-                    span.style.filter = '';
-                    span.style.backgroundColor = '';
-                    span.style.fontFamily = '';
-                    span.style.fontSize = '';
+                    span.style.filter = ''; span.style.backgroundColor = '';
+                    span.style.fontFamily = ''; span.style.fontSize = '';
                 }
             });
         }
@@ -715,10 +718,7 @@
         editor.focus();
     }
 
-    const pickrOptions = {
-        theme: 'nano',
-        components: { preview: true, opacity: true, hue: true, interaction: { hex: true, input: true, save: true } }
-    };
+    const pickrOptions = { theme: 'nano', components: { preview: true, opacity: true, hue: true, interaction: { hex: true, input: true, save: true } } };
 
     const pickrText = Pickr.create({ el: '#picker-text', default: '#27272a', ...pickrOptions, strings: { save: '적용' }});
     pickrText.on('save', (color) => { execCmd('foreColor', color.toHEXA().toString()); pickrText.hide(); });
@@ -727,10 +727,7 @@
     pickrHighlight.on('save', (color) => { execCmd('backColor', color.toHEXA().toString()); pickrHighlight.hide(); });
 
     const pickrGlobalText = Pickr.create({ el: '#picker-global-text', default: '#27272a', ...pickrOptions, strings: { save: '적용' }});
-    function setGlobalTextColor(hexColor) {
-        editor.style.color = hexColor;
-        pickrGlobalText.setColor(hexColor);
-    }
+    function setGlobalTextColor(hexColor) { editor.style.color = hexColor; pickrGlobalText.setColor(hexColor); }
     pickrGlobalText.on('save', (color) => { setGlobalTextColor(color.toHEXA().toString()); pickrGlobalText.hide(); });
     pickrGlobalText.on('change', (color) => { editor.style.color = color.toHEXA().toString(); });
 
@@ -760,70 +757,45 @@
         }
     }
 
-    let customGradStart = '#ffffff';
-    let customGradEnd = '#cccccc';
-
+    let customGradStart = '#ffffff'; let customGradEnd = '#cccccc';
     const pickrGradStart = Pickr.create({ el: '#picker-grad-start', default: customGradStart, ...pickrOptions, strings: { save: '적용' }});
-    pickrGradStart.on('change', (color) => { 
-        customGradStart = color.toHEXA().toString(); 
-        document.getElementById('bg-gradient').value = 'custom';
-        updateCustomGradient(); 
-    });
+    pickrGradStart.on('change', (color) => { customGradStart = color.toHEXA().toString(); document.getElementById('bg-gradient').value = 'custom'; updateCustomGradient(); });
 
     const pickrGradEnd = Pickr.create({ el: '#picker-grad-end', default: customGradEnd, ...pickrOptions, strings: { save: '적용' }});
-    pickrGradEnd.on('change', (color) => { 
-        customGradEnd = color.toHEXA().toString(); 
-        document.getElementById('bg-gradient').value = 'custom';
-        updateCustomGradient(); 
-    });
+    pickrGradEnd.on('change', (color) => { customGradEnd = color.toHEXA().toString(); document.getElementById('bg-gradient').value = 'custom'; updateCustomGradient(); });
 
     function applyBgGradientPreset(val) {
-        if (val === 'custom') {
-            updateCustomGradient();
-        } else {
-            svgBg.setAttribute('fill', val);
-        }
+        if (val === 'custom') { updateCustomGradient(); } else { svgBg.setAttribute('fill', val); }
     }
 
     function updateCustomGradient() {
         const direction = document.getElementById('grad-direction').value;
         const customGrad = document.getElementById('custom-grad');
-        const startStop = document.getElementById('custom-grad-start');
-        const endStop = document.getElementById('custom-grad-end');
-
-        if(direction === 'top-bottom') {
-            customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '0%'); customGrad.setAttribute('y2', '100%');
-        } else if (direction === 'left-right') {
-            customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '100%'); customGrad.setAttribute('y2', '0%');
-        } else if (direction === 'topleft-bottomright') {
-            customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '100%'); customGrad.setAttribute('y2', '100%');
-        } else if (direction === 'bottomleft-topright') {
-            customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '100%'); customGrad.setAttribute('x2', '100%'); customGrad.setAttribute('y2', '0%');
-        }
-
-        startStop.setAttribute('stop-color', customGradStart);
-        endStop.setAttribute('stop-color', customGradEnd);
-
+        if(direction === 'top-bottom') { customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '0%'); customGrad.setAttribute('y2', '100%'); } 
+        else if (direction === 'left-right') { customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '100%'); customGrad.setAttribute('y2', '0%'); } 
+        else if (direction === 'topleft-bottomright') { customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '0%'); customGrad.setAttribute('x2', '100%'); customGrad.setAttribute('y2', '100%'); } 
+        else if (direction === 'bottomleft-topright') { customGrad.setAttribute('x1', '0%'); customGrad.setAttribute('y1', '100%'); customGrad.setAttribute('x2', '100%'); customGrad.setAttribute('y2', '0%'); }
+        
+        document.getElementById('custom-grad-start').setAttribute('stop-color', customGradStart);
+        document.getElementById('custom-grad-end').setAttribute('stop-color', customGradEnd);
         if(document.getElementById('tab-gradient').classList.contains('active')) {
             document.getElementById('bg-gradient').value = 'custom';
             svgBg.setAttribute('fill', 'url(#custom-grad)');
         }
     }
 
-    function applyBgTexture(isChecked) {
-        svgBg.style.filter = isChecked ? 'url(#paper-texture)' : 'none';
-    }
+    function applyBgTexture(isChecked) { svgBg.style.filter = isChecked ? 'url(#paper-texture)' : 'none'; }
 
     function updateTextFormat() {
         const lsValue = document.getElementById('letter-space').value;
         const lhValue = document.getElementById('line-height').value;
         document.getElementById('ls-val').textContent = lsValue;
         document.getElementById('lh-val').textContent = lhValue;
-        
         editor.style.letterSpacing = lsValue + 'px';
         editor.style.lineHeight = lhValue;
         editor.style.wordBreak = document.getElementById('word-break').value;
         editor.style.textIndent = document.getElementById('text-indent').checked ? '16px' : '0px'; 
+        updateLayout(); 
     }
 
     function applyCanvasPreset(val) {
@@ -848,7 +820,7 @@
 
     function updateLayout() {
         const w = parseInt(document.getElementById('canvas-w').value);
-        const h = parseInt(document.getElementById('canvas-h').value);
+        const baseH = parseInt(document.getElementById('canvas-h').value);
         const pt = parseInt(document.getElementById('pad-t').value);
         const pb = parseInt(document.getElementById('pad-b').value);
         const pl = parseInt(document.getElementById('pad-l').value);
@@ -859,102 +831,178 @@
         document.getElementById('pad-l-val').textContent = pl;
         document.getElementById('pad-r-val').textContent = pr;
 
+        editor.style.height = 'auto'; 
+        const contentH = editor.offsetHeight; 
+        
+        const requiredH = pt + contentH + pb;
+        const displayH = Math.max(baseH, requiredH);
+
         svgElement.setAttribute('width', w);
-        svgElement.setAttribute('height', h);
-        svgElement.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svgElement.setAttribute('height', displayH);
+        svgElement.setAttribute('viewBox', `0 0 ${w} ${displayH}`);
         
         foreignObj.setAttribute('x', pl);
         foreignObj.setAttribute('y', pt);
         foreignObj.setAttribute('width', Math.max(10, w - pl - pr));
-        foreignObj.setAttribute('height', Math.max(10, h - pt - pb));
+        foreignObj.setAttribute('height', displayH - pt - pb); 
+        
+        editor.style.height = '100%'; 
     }
 
-    /* 📌 dom-to-image-more 라이브러리를 활용한 완벽한 클라이언트 렌더링 도입 */
-    async function startDownload() {
+    /* 📌 1. 버그 수정: 세로(Y축) 분할 방식으로 복구하여 다단 레이아웃이 텍스트 줄바꿈을 부자연스럽게 망가뜨리는 현상 제거 */
+    /* 📌 2. 버그 수정: 캡처 시 에디터 컨테이너 높이를 100%가 아닌 '측정된 실제 텍스트 높이(pureTotalHeight)'로 고정하여 두 번째 장 이후로 텍스트가 잘려 빈 화면이 나오는 현상 완벽 방어 */
+    /* 📌 3. 버그 수정: 무식하게 픽셀 단위로 당겨서 글자 중간이 잘리는 현상을 막기 위해, 실제 텍스트의 줄 높이(line-height) 배수에 맞춰서만 분할 이동하도록 보정 */
+    async function showPreview() {
         window.getSelection().removeAllRanges();
         editor.blur();
 
         const btn = document.getElementById('start-download-btn');
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = "저장 중... (잠시 대기)";
+        btn.innerHTML = "미리보기 렌더링 중...";
         btn.disabled = true;
 
         const baseW = parseInt(document.getElementById('canvas-w').value);
         const baseH = parseInt(document.getElementById('canvas-h').value);
         const pt = parseInt(document.getElementById('pad-t').value);
         const pb = parseInt(document.getElementById('pad-b').value);
+        const pl = parseInt(document.getElementById('pad-l').value);
+        const pr = parseInt(document.getElementById('pad-r').value);
         const isCropLast = document.getElementById('crop-last').checked;
 
-        const contentAreaHeight = baseH - pt - pb;
+        const contentAreaW = baseW - pl - pr;
+        const rawContentAreaH = baseH - pt - pb;
 
-        // 원본 저장
-        const originalSvgHeight = svgElement.getAttribute('height');
-        const originalViewBox = svgElement.getAttribute('viewBox');
-        const originalForeignHeight = foreignObj.getAttribute('height');
-        const originalTransform = editor.style.transform;
+        // 원상 복구를 위한 현재 에디터 상태 백업
+        const origSvgH = svgElement.getAttribute('height');
+        const origViewBox = svgElement.getAttribute('viewBox');
+        const origForeignW = foreignObj.getAttribute('width');
+        const origForeignH = foreignObj.getAttribute('height');
+        const origTransform = editor.style.transform;
+        const origHeight = editor.style.height;
 
-        // 실제 높이 계산
-        foreignObj.setAttribute('height', '100000');
-        const totalContentHeight = editor.scrollHeight;
-        foreignObj.setAttribute('height', originalForeignHeight);
+        // [핵심 해결 로직] 브라우저에 렌더링된 텍스트의 실제 줄 높이를 정확히 파악
+        const computedStyle = window.getComputedStyle(editor);
+        let lineHeightPx = parseFloat(computedStyle.lineHeight);
+        if (isNaN(lineHeightPx)) {
+            const fontSize = parseFloat(computedStyle.fontSize);
+            const lineSpacing = parseFloat(document.getElementById('line-height').value) || 1.8;
+            lineHeightPx = fontSize * lineSpacing;
+        }
 
-        let totalPages = Math.ceil(totalContentHeight / contentAreaHeight);
-        if (totalPages === 0) totalPages = 1;
+        // 분할 영역의 높이를 무조건 줄 높이의 배수로 딱 떨어지게 내림(floor)하여 글자 중간 잘림 원천 차단
+        let safeContentAreaH = Math.floor(rawContentAreaH / lineHeightPx) * lineHeightPx;
+        if (safeContentAreaH <= 0) safeContentAreaH = lineHeightPx;
+
+        // 문서의 순수 전체 높이를 1회 정확하게 측정
+        editor.style.height = 'auto';
+        const pureTotalHeight = editor.scrollHeight;
+
+        let totalPages = Math.ceil(pureTotalHeight / safeContentAreaH);
+        if (totalPages <= 0 || editor.innerText.trim() === '') totalPages = 1;
+
+        generatedImages = [];
+        const previewContainer = document.getElementById('preview-images-container');
+        previewContainer.innerHTML = '';
 
         for (let i = 0; i < totalPages; i++) {
-            let currentCanvasHeight = baseH;
-            let translateY = -(i * contentAreaHeight);
+            let currentCanvasHeight = baseH; // 사용자가 설정한 원본 캔버스 높이 유지
+            let currentForeignH = safeContentAreaH;
 
+            // 마지막 페이지 자르기 기능
             if (i === totalPages - 1 && isCropLast) {
-                const remainingHeight = totalContentHeight - (i * contentAreaHeight);
-                currentCanvasHeight = remainingHeight + pt + pb;
+                const remainingContentH = pureTotalHeight - (i * safeContentAreaH);
+                if (remainingContentH > 0 && remainingContentH < safeContentAreaH) {
+                    currentForeignH = remainingContentH + 10; // 글자 밑동 잘림 방지 안전 여백 10px 추가
+                    currentCanvasHeight = currentForeignH + pt + pb;
+                } else if (remainingContentH <= 0 && totalPages > 1) {
+                    continue; // 텍스트가 남지 않은 빈 페이지는 캡처 무시
+                }
             }
 
-            // 분할 렌더링을 위해 실제 DOM을 일시적으로 수정
+            // 캔버스 크기 조정
             svgElement.setAttribute('height', currentCanvasHeight);
             svgElement.setAttribute('viewBox', `0 0 ${baseW} ${currentCanvasHeight}`);
-            foreignObj.setAttribute('height', currentCanvasHeight - pt - pb);
+            
+            // 페이지 영역과 동일하게 설정 (상하좌우 여백 유지)
+            foreignObj.setAttribute('width', contentAreaW);
+            foreignObj.setAttribute('height', currentForeignH); 
+
+            // 높이를 100%가 아닌 '실제 텍스트 높이'로 고정
+            editor.style.height = pureTotalHeight + 'px';
+            
+            // 무식한 픽셀 단위가 아닌 "줄 간격이 온전히 보장된 단위"로만 텍스트를 위로 당겨오기
+            let translateY = -(i * safeContentAreaH);
             editor.style.transform = `translateY(${translateY}px)`;
 
-            // DOM 렌더링 반영을 위한 약간의 딜레이
-            await new Promise(r => setTimeout(r, 150));
+            await new Promise(r => setTimeout(r, 150)); 
 
             try {
-                // dom-to-image-more를 사용하여 웹 폰트/CSS 파싱 완벽 지원 캡처
                 const dataUrl = await domtoimage.toPng(svgElement, {
-                    width: baseW,
-                    height: currentCanvasHeight,
+                    width: baseW, height: currentCanvasHeight,
                     style: { transform: 'none', transformOrigin: 'top left' }
                 });
+                
+                generatedImages.push(dataUrl);
 
-                let filename = totalPages > 1 ? `novel_excerpt_page_${i + 1}.png` : `novel_excerpt.png`;
-                const downloadLink = document.createElement('a');
-                downloadLink.href = dataUrl;
-                downloadLink.download = filename;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-
-                // 여러 장 다운로드 시 브라우저 차단 방지
-                await new Promise(r => setTimeout(r, 400));
+                const imgEl = document.createElement('img');
+                imgEl.src = dataUrl;
+                imgEl.style.maxWidth = '100%';
+                imgEl.style.height = 'auto';
+                imgEl.style.marginBottom = '12px';
+                imgEl.style.border = '1px solid #e4e4e7';
+                imgEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                previewContainer.appendChild(imgEl);
             } catch (e) {
                 console.error("Capture failed:", e);
-                alert("이미지 저장 중 오류가 발생했습니다. (외부 폰트/이미지 보안 제한일 수 있습니다.)");
+                alert("미리보기 렌더링 중 오류가 발생했습니다.");
+                break;
             }
         }
 
-        // DOM 원상 복구
-        svgElement.setAttribute('height', originalSvgHeight);
-        svgElement.setAttribute('viewBox', originalViewBox);
-        foreignObj.setAttribute('height', originalForeignHeight);
-        editor.style.transform = originalTransform || 'none';
+        // 캡처 종료 후 DOM을 원래 무한 캔버스 상태로 복원
+        svgElement.setAttribute('height', origSvgH);
+        svgElement.setAttribute('viewBox', origViewBox);
+        foreignObj.setAttribute('width', origForeignW);
+        foreignObj.setAttribute('height', origForeignH);
+        editor.style.transform = origTransform || 'none';
+        editor.style.height = origHeight || '100%';
+
+        updateLayout(); 
         
         btn.innerHTML = originalBtnText;
         btn.disabled = false;
+
+        if (generatedImages.length > 0) {
+            document.getElementById('preview-modal').style.display = 'flex';
+            document.getElementById('download-confirm-btn').innerText = `저장하기 (${generatedImages.length}장)`;
+        }
+    }
+
+    function closePreview() { document.getElementById('preview-modal').style.display = 'none'; }
+
+    async function downloadGeneratedImages() {
+        const btn = document.getElementById('download-confirm-btn');
+        btn.innerText = "저장 진행 중...";
+        btn.disabled = true;
+
+        for (let i = 0; i < generatedImages.length; i++) {
+            let filename = generatedImages.length > 1 ? `novel_excerpt_page_${i + 1}.png` : `novel_excerpt.png`;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = generatedImages[i];
+            downloadLink.download = filename;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            await new Promise(r => setTimeout(r, 400));
+        }
+
+        btn.innerText = `저장하기 (${generatedImages.length}장)`;
+        btn.disabled = false;
+        closePreview();
     }
     
     updateCustomGradient();
+    updateLayout();
 </script>
 </body>
 </html>
-
