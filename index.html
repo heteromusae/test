@@ -147,17 +147,25 @@
         }
 
         .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .editor-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; }
+        .editor-section { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         
-        .workspace { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow: auto; }
+        /* 📌 상단 캔버스 잘림 버그 픽스: Flexbox 중앙 정렬 시 스크롤 초과 영역이 잘리는 문제를 Block 방식 정렬로 해결 */
+        .workspace { 
+            flex: 1; 
+            padding: 40px 20px; 
+            overflow: auto; 
+            text-align: center; 
+        }
 
         #svg-container {
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             background: white;
+            display: inline-block;
+            text-align: left;
             max-width: 100%;
             height: auto; 
-            display: flex;
             transition: width 0.3s ease;
+            vertical-align: top;
         }
 
         svg { display: block; width: 100%; height: auto; }
@@ -227,39 +235,6 @@
         .btn-submit:hover { background: var(--point-purple-hover); }
         .btn-submit:disabled { background: #a1a1aa; cursor: not-allowed; }
 
-        /* 📌 편집기 줌 컨트롤 CSS */
-        .zoom-controls {
-            position: absolute;
-            bottom: 24px;
-            right: 24px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 6px 8px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 10;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(4px);
-        }
-        .zoom-controls button {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            border-radius: 4px;
-            transition: background 0.1s;
-        }
-        .zoom-controls button:hover { background: #e4e4e7; }
-        .zoom-controls button svg { width: 16px; height: 16px; }
-        .zoom-controls span { font-size: 13px; font-weight: 700; min-width: 44px; text-align: center; color: var(--text-main); }
-
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
             .sidebar { position: absolute; right: -320px; top: 0; height: 100%; z-index: 100; }
@@ -268,7 +243,6 @@
             header h1 { font-size: 16px; }
             .toolbar { padding: 8px 12px; }
             .tool-group { padding-right: 8px; gap: 2px; }
-            .zoom-controls { bottom: 16px; right: 16px; }
         }
     </style>
 </head>
@@ -409,16 +383,6 @@
                     </foreignObject>
                 </svg>
             </div>
-        </div>
-        
-        <div class="zoom-controls">
-            <button onclick="setZoom(zoomLevel - 0.1)" title="축소">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <span id="zoom-val">100%</span>
-            <button onclick="setZoom(zoomLevel + 0.1)" title="확대">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
         </div>
     </div>
     
@@ -619,23 +583,6 @@
     const svgBg = document.getElementById('svg-bg');
     let generatedImages = [];
     
-    // 📌 편집기 시각적 줌(Zoom) 관련 로직 추가
-    let zoomLevel = 1;
-    function setZoom(level) {
-        zoomLevel = Math.max(0.2, Math.min(level, 3)); // 20% ~ 300% 제한
-        document.getElementById('zoom-val').textContent = Math.round(zoomLevel * 100) + '%';
-        const container = document.getElementById('svg-container');
-        
-        // CSS zoom 속성을 최우선으로 사용하여 스크롤바 영역까지 완벽히 조절
-        container.style.zoom = zoomLevel;
-        
-        // zoom 속성을 미지원하는 구형 브라우저를 위한 폴백
-        if (!('zoom' in container.style)) {
-            container.style.transform = `scale(${zoomLevel})`;
-            container.style.transformOrigin = 'top center';
-        }
-    }
-
     editor.addEventListener('input', updateLayout);
 
     function toggleSidebar() {
@@ -910,11 +857,158 @@
         editor.style.height = '100%'; 
     }
 
-    /* 📌 화질 개선 핵심 수정: 라이브러리 내장 옵션(scale)을 사용해 CSS 붕괴 없이 고해상도 추출 */
+    /* 📌 1. 버그 픽스: 고화질 스케일링 시, 레이아웃 크기를 원본(1x) 픽셀로 강제 고정하여 글씨가 거대해져서 캔버스를 탈출하는 증상 차단 */
     async function showPreview() {
         window.getSelection().removeAllRanges();
         editor.blur();
 
         const btn = document.getElementById('start-download-btn');
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = "미리
+        btn.innerHTML = "미리보기 렌더링 중...";
+        btn.disabled = true;
+
+        const baseW = parseInt(document.getElementById('canvas-w').value);
+        const baseH = parseInt(document.getElementById('canvas-h').value);
+        const pt = parseInt(document.getElementById('pad-t').value);
+        const pb = parseInt(document.getElementById('pad-b').value);
+        const pl = parseInt(document.getElementById('pad-l').value);
+        const pr = parseInt(document.getElementById('pad-r').value);
+        const isCropLast = document.getElementById('crop-last').checked;
+
+        const contentAreaW = baseW - pl - pr;
+        const rawContentAreaH = baseH - pt - pb;
+
+        const origSvgH = svgElement.getAttribute('height');
+        const origViewBox = svgElement.getAttribute('viewBox');
+        const origForeignW = foreignObj.getAttribute('width');
+        const origForeignH = foreignObj.getAttribute('height');
+        const origTransform = editor.style.transform;
+        const origHeight = editor.style.height;
+
+        const computedStyle = window.getComputedStyle(editor);
+        let lineHeightPx = parseFloat(computedStyle.lineHeight);
+        if (isNaN(lineHeightPx)) {
+            const fontSize = parseFloat(computedStyle.fontSize);
+            const lineSpacing = parseFloat(document.getElementById('line-height').value) || 1.8;
+            lineHeightPx = fontSize * lineSpacing;
+        }
+
+        let safeContentAreaH = Math.floor(rawContentAreaH / lineHeightPx) * lineHeightPx;
+        if (safeContentAreaH <= 0) safeContentAreaH = lineHeightPx;
+
+        editor.style.height = 'auto';
+        const pureTotalHeight = editor.scrollHeight;
+
+        let totalPages = Math.ceil(pureTotalHeight / safeContentAreaH);
+        if (totalPages <= 0 || editor.innerText.trim() === '') totalPages = 1;
+
+        generatedImages = [];
+        const previewContainer = document.getElementById('preview-images-container');
+        previewContainer.innerHTML = '';
+
+        const scale = 3;
+
+        for (let i = 0; i < totalPages; i++) {
+            let currentCanvasHeight = baseH; 
+            let currentForeignH = safeContentAreaH;
+
+            if (i === totalPages - 1 && isCropLast) {
+                const remainingContentH = pureTotalHeight - (i * safeContentAreaH);
+                if (remainingContentH > 0 && remainingContentH < safeContentAreaH) {
+                    currentForeignH = remainingContentH + 10; 
+                    currentCanvasHeight = currentForeignH + pt + pb;
+                } else if (remainingContentH <= 0 && totalPages > 1) {
+                    continue; 
+                }
+            }
+
+            svgElement.setAttribute('height', currentCanvasHeight);
+            svgElement.setAttribute('viewBox', `0 0 ${baseW} ${currentCanvasHeight}`);
+            
+            foreignObj.setAttribute('width', contentAreaW);
+            foreignObj.setAttribute('height', currentForeignH); 
+
+            editor.style.height = pureTotalHeight + 'px';
+            
+            let translateY = -(i * safeContentAreaH);
+            editor.style.transform = `translateY(${translateY}px)`;
+
+            await new Promise(r => setTimeout(r, 150)); 
+
+            try {
+                const dataUrl = await domtoimage.toPng(svgElement, {
+                    width: baseW * scale, 
+                    height: currentCanvasHeight * scale,
+                    style: { 
+                        transform: `scale(${scale})`, 
+                        transformOrigin: 'top left',
+                        /* 핵심: 화질은 3배 키우되, 글자 배치를 위한 틀(박스)은 1배수 원본 픽셀로 강제 결박 */
+                        width: `${baseW}px`,
+                        height: `${currentCanvasHeight}px`
+                    }
+                });
+                
+                generatedImages.push(dataUrl);
+
+                const imgEl = document.createElement('img');
+                imgEl.src = dataUrl;
+                imgEl.style.maxWidth = '100%';
+                imgEl.style.height = 'auto';
+                imgEl.style.marginBottom = '12px';
+                imgEl.style.border = '1px solid #e4e4e7';
+                imgEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                previewContainer.appendChild(imgEl);
+            } catch (e) {
+                console.error("Capture failed:", e);
+                alert("미리보기 렌더링 중 오류가 발생했습니다.");
+                break;
+            }
+        }
+
+        // DOM 상태 복구
+        svgElement.setAttribute('height', origSvgH);
+        svgElement.setAttribute('viewBox', origViewBox);
+        foreignObj.setAttribute('width', origForeignW);
+        foreignObj.setAttribute('height', origForeignH);
+        editor.style.transform = origTransform || 'none';
+        editor.style.height = origHeight || '100%';
+
+        updateLayout(); 
+        
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
+
+        if (generatedImages.length > 0) {
+            document.getElementById('preview-modal').style.display = 'flex';
+            document.getElementById('download-confirm-btn').innerText = `저장하기 (${generatedImages.length}장)`;
+        }
+    }
+
+    function closePreview() { document.getElementById('preview-modal').style.display = 'none'; }
+
+    async function downloadGeneratedImages() {
+        const btn = document.getElementById('download-confirm-btn');
+        btn.innerText = "저장 진행 중...";
+        btn.disabled = true;
+
+        for (let i = 0; i < generatedImages.length; i++) {
+            let filename = generatedImages.length > 1 ? `novel_excerpt_page_${i + 1}.png` : `novel_excerpt.png`;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = generatedImages[i];
+            downloadLink.download = filename;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            await new Promise(r => setTimeout(r, 400));
+        }
+
+        btn.innerText = `저장하기 (${generatedImages.length}장)`;
+        btn.disabled = false;
+        closePreview();
+    }
+    
+    updateCustomGradient();
+    updateLayout();
+</script>
+</body>
+</html>
